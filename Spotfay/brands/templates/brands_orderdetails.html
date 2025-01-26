@@ -1,0 +1,604 @@
+{% extends 'brands_base.html' %}
+{% load static %}
+{% block title %}order details{% endblock %}
+{% block page_content %}
+
+<div class="col-12 col-sm-10 mx-auto mt-3">       
+    <a href="{% url 'brands_projectmanagment' %}" class="btn border-0"><span class="material-symbols-outlined ms-2 mb-4" style="color: rgb(59, 5, 249);">keyboard_backspace</span></a>
+    <h4 class="ms-2"> {{order.project_name|default_if_none:""}} </h4>
+    <div class="d-flex gap-3 align-items-center my-3 ms-2">
+        <h6 class="text-secondary fw-light m-0">Campaign status</h6>
+        {% if order.order_status == "completed" %}
+            <div class="alert alert-primary border-0 m-0 py-1 px-3" style="width: min-content;font-size:12px" role="alert">Completed</div>
+        {% elif order.order_status == "pending_creator_approval" or campaign.order.order_status == "pending_creator_selecting" %} <!--creator has just approved the job-->
+            <div class="alert alert-warning text-danger border-0 m-0 py-1 px-3" style="width: min-content;font-size:12px" role="alert">Processing</div>
+        {% elif order.order_status == "processing"%} <!--creator had got approved by the brand owner-->
+            <div class="alert alert-success text-success border-0 m-0 py-1 px-3" style="width: min-content;font-size:12px" role="alert">Active</div>
+        {% elif order.order_status == "pending_approval"%} <!-- pending to approve the creator's video -->
+            <div class="alert alert-info text-info border-0 m-0 py-1 px-2" style="width: fit-content;font-size:12px" role="alert">Pending approval</div>
+        {% elif order.order_status == "cancelled"%} <!--order cancelled-->
+            <div class="alert alert-danger text-danger border-0 m-0 py-1 px-3" style="width: min-content;font-size:12px" role="alert">Cancelled</div>
+        {% endif %}
+    </div>
+    <!-- first section -->
+    <div class="bg-white rounded rounded-2 shadow-sm py-4 px-sm-4 ">
+        <div class="card ps-3 ps-sm-3 border-0 p-0 m-0" style="max-width: 420px;">
+            <div class="d-flex align-items-stretch gap-sm-1 g-0">
+              <div class="col-6">
+                <img src="{{order.product_img.url|default_if_none:""}}" class="img-fluid rounded" alt="...">
+              </div>
+              <div class="col-6">
+                <div class="col ps-2 pe-0 d-flex flex-column h-100 justify-content-between card-body py-0">
+                  <div class="row">
+                    <h6 class="text-black-50 mb-0 mb-sm-2">Brand</h6>
+                    <h6 class="">{{order.company.company_name|default_if_none:""}}</h6>
+                  </div>
+                  <div class="row">
+                    <h6 class="text-black-50 mb-0 mb-sm-2">Product</h6>
+                    <h6 class="">{{order.product_name|default_if_none:""}}</h6>
+                  </div>
+                  <div class="row mb-3">
+                  <a href="https://{{order.product_link|default_if_none:""}}" class="text-decoration-none gap-1 d-flex align-items-center text-black-50 fs-6">Product link<span class="material-symbols-outlined" style="color: rgb(59	5	251);">arrow_outward</span></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <hr class="text-secondary fw-bold bg-secondary" size="4px">
+          <div class="row d-flex gap-0 justify-content-between gap-sm-0 col-10 px-sm-0 ps-3 m-0" style="max-width: 330px;">
+            <div class="col">
+              <div class="row fs-6 text-secondary">Video duration</div>
+              <div class="row my-3 fs-6 text-secondary">Content format</div>
+              <div class="row fs-6 text-secondary">Content type</div>
+            </div>
+            <div class="col col-5">
+              <div class="row fs-6">{{order.video_duration|default_if_none:""}} sec.</div>
+              <div class="row my-3 fs-6">{{order.video_size|default_if_none:""}}</div>
+              <div class="row fs-6">{{order.video_type|default_if_none:""}}</div>
+            </div>
+          </div>
+          {% if order.additional_notes %}
+            <hr class="text-secondary fw-bold bg-secondary" size="4px">
+            <div class="px-3 px-sm-0" style="max-width: 330px;">
+                <h5 class="text-secondary fs-6">Unique selling point</h5>
+                <p class="fs-6 mb-0" id="USP">{{order.additional_notes|default_if_none:""}}</p>
+                <a href="#" id="readMoreLink" style="display: none;" onclick="toggleReadMore(event)">read more...</a>
+                <a href="#" id="readLessLink" style="display: none;" onclick="toggleReadMore(event)">read less...</a>
+                <script>
+                    function truncateText(text, maxLength) {
+                        if (text.length > maxLength) {
+                        return text.substring(0, maxLength) + '...';
+                        } else {
+                        return text;
+                        }
+                    }
+                    
+                    function toggleReadMore(event) {
+                        event.preventDefault();
+                        const USP = document.getElementById('USP');
+                        const readMoreLink = document.getElementById('readMoreLink');
+                        const readLessLink = document.getElementById('readLessLink');
+                    
+                        if (readMoreLink.style.display === 'inline') {
+                        USP.innerText = USP.getAttribute('data-full-text');
+                        readMoreLink.style.display = 'none';
+                        readLessLink.style.display = 'inline';
+                        } else {
+                        const fullText = USP.getAttribute('data-full-text');
+                        USP.innerText = truncateText(fullText, 50);
+                        readMoreLink.style.display = 'inline';
+                        readLessLink.style.display = 'none';
+                        }
+                    }
+                    
+                    // Initialize the text
+                    const USP = document.getElementById('USP');
+                    const fullText = USP.innerText;
+                    USP.setAttribute('data-full-text', fullText);
+                    USP.innerText = truncateText(fullText, 50);
+                    document.getElementById('readMoreLink').style.display = 'inline';
+                </script>       
+            </div>            
+          {% endif %}
+          <hr class="text-secondary fw-bold bg-secondary" size="4px">
+          <div class="row d-flex px-sm-0 col-10 col-sm-12 ps-3 m-0" style="max-width: 330px;">
+            <div class="col">
+              <div class="row fs-6 text-secondary">Number of videos</div>
+              <div class="row fs-6 text-secondary">Total</div>
+            </div>
+            <div class="col col-5">
+              <div class="row fs-6"> {{order.num_of_videos|default_if_none:""}} </div>
+              <div class="row fs-6">${{order.total_price|floatformat:0|default_if_none:""}} </div>
+            </div>
+          </div>
+    </div>
+    <!-- second section -->
+    <div class="mt-4">
+        <ul class="nav mx-2 nav-underline mb-3 gap-3 gap-md-4 border-bottom border-3 p-0" id="underline-tab" role="tablist">
+            <li class="nav-item d-flex" role="presentation">
+                <button class="nav-link px-0 px-sm-2 position-relative text-muted fs-6 active d-flex align-items-center fw-light" style="top:3px;" id="underline-Creators-tab" data-bs-toggle="pill" data-bs-target="#underline-creators" type="button" role="tab" aria-controls="underline-Creators" aria-selected="true">Creators 
+                    {% if order.selecting_creators.all|length != 0 %}
+                        ({{order.selecting_creators.all|length|default_if_none:""}})
+                    {% endif %}
+                    {% if order.order_status == "pending_creator_approval" %}
+                        <span class="position-absolute p-1 bg-danger border border-light rounded-circle" style="left: 95%;top:20%;">
+                            <span class="visually-hidden">New alerts</span>
+                        </span>
+                    {% endif %}
+                </button>
+            </li>
+            <li class="nav-item d-flex" role="presentation">
+                <button class="nav-link px-0 px-sm-2 text-muted position-relative fs-6 d-flex align-items-center ms-1 fw-light" style="top:3px;" id="underline-content-tab" data-bs-toggle="pill" data-bs-target="#underline-content" type="button" role="tab" aria-controls="underline-content" aria-selected="false">Content {% if order.videos.all|length != 0 %}({{order.videos.all|length|default_if_none:""}}){% endif %}
+                    {% if order.order_status == "pending_approval" %}
+                        <span class="position-absolute p-1 bg-danger border border-light rounded-circle" style="left: 95%;top:20%;">
+                            <span class="visually-hidden">New alerts</span>
+                        </span>
+                    {% endif %}
+                </button>
+            </li>
+            {% if order.order_status == "processing" or order.order_status == "pending_approval" %}
+                <li class="nav-item d-flex" role="presentation">
+                    <button class="nav-link py-0 px-0 px-sm-2 text-muted position-relative fs-6 d-flex align-items-center ms-1 fw-light" style="top:3px;" id="underline-delivery-tab" data-bs-toggle="pill" data-bs-target="#underline-delivery" type="button" role="tab" aria-controls="underline-delivery" aria-selected="false">Delivery
+                        {% if order.tracking_nums.all %}
+                            {% for tracking_data in order.tracking_nums.all %}
+                                {% if not tracking_data.tracking_num and not tracking_data.shipping_carrier %}
+                                    <span class="position-absolute p-1 bg-danger border border-light rounded-circle" style="left: 90%;top:20%;">
+                                        <span class="visually-hidden">New alerts</span>
+                                    </span>                                                    
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </button>
+                </li>                      
+            {% endif %}
+      </ul>
+        <div class="tab-content" id="underline-tabContent">
+                <!-- Creators -->
+                <div class="tab-pane fade show active rounded rounded-2 pb-5 px-0 px-sm-3" id="underline-creators" role="tabpanel" aria-labelledby="underline-creators-tab" tabindex="0">
+                    <ul class="nav nav-underline show acitve my-3 mx-2 d-flex align-items-center" id="pills-tab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link text-secondary active border-0 fw-light" id="applicants-tab" style="font-size:small;" data-bs-toggle="pill" data-bs-target="#applicants" type="button" role="tab" aria-controls="applicants" aria-selected="true">Applicants</li>
+                        <span class="text-black-50">|</span>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link text-secondary border-0 fw-light" id="approved-tab" style="font-size:small;" data-bs-toggle="pill" data-bs-target="#approved" type="button" role="tab" aria-controls="approved" aria-selected="false">Approved {% if order.applied_creator %}(1){% endif %}</button>
+                        </li>
+                    </ul>
+                        <div class="tab-content" id="underline-tabContent">
+                            <!-- applicants -->
+                            <div class="tab-pane fade shadow-sm w-100 show active bg-white rounded rounded-2 py-5 px-3" id="applicants" role="tabpanel" aria-labelledby="applicants-tab" tabindex="0">
+                                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-6 g-3 mx-auto">
+                                    {% for creator in order.selecting_creators.all %}
+                                        {% if creator.userinfos != order.applied_creator %}  
+                                                                    
+                                            <div class="col d-sm-block d-flex justify-content-center applicants">
+                                                <div class="card border-0" style="min-width: 150px;max-width: 250px;box-shadow: 0px 1px 5px #0000002d;">
+                                                    <div class="card-body pb-1 px-2">
+                                                        <h6 class="card-title mb-0 d-flex align-items-center gap-1" style="font-size: small;">{{creator.first_name|default_if_none:""}} {{creator.last_name|default_if_none:""}}<small class="text-secondary m-0"> ({{creator.userinfos.gender|default_if_none:""}}) </small></h6>
+                                                        <small class="text-secondary m-0" style="font-size: small;">{{creator.userinfos.city|default_if_none:""}}, {{creator.userinfo.country|default_if_none:""}}</small>
+                                                    </div>
+                                                    <div class="overflow-hidden d-flex align-items-center rounded rounded-1 mx-2 mb-2" style="height: 180px">
+                                                        <button class="border-0 p-0 m-0" type="button" style="width: inherit;height:inherit;" data-bs-toggle="offcanvas" data-bs-target="#creator_profile" aria-controls="creator_profile">
+                                                            <img src="{{creator.userinfos.user_profile.url|default_if_none:""}}" style="height:100%;width:100%;object-fit:cover;" alt="...">
+                                                        </button>
+                                                    </div>
+                                                    {% if order.order_status == 'pending_creator_selecting' or order.order_status == 'pending_creator_approval' %}
+                                                        <div class="card-body pb-3 pt-0 d-flex justify-content-center">
+                                                            <a href="{% url 'brands_approvingcreator' order.id creator.userinfos.id %}" class="btn fw-bold text-light col-10" style="background-color: #4a0efb;font-size:small;">Approve</a>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>   
+                                            <!-- offcanvas creator profile -->
+                                            <div class="offcanvas mt-0 offcanvas-end overflow-auto" style="width: 35rem;z-index:5000;height:100vh;" tabindex="-1" id="creator_profile" aria-labelledby="creator_profileLabel">
+                                                <div class="d-flex justify-content-end pt-3">
+                                                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                                                </div>
+                                                <div>
+
+                                                    <div class="offcanvas-header text-start p-0" style="height: max-content;">
+                                                        <div class="">
+                                                            <div class="d-block justify-content-center mx-auto mx-md-0 d-md-flex align-items-center gap-3 my-4" style="width:fit-content;">
+                                                                <div class="rounded rounded-circle overflow-hidden d-flex align-items-center justify-content-center" style="height: 150px;width: 150px;">
+                                                                    <img src="{{creator.userinfos.user_profile.url|default_if_none:""}}" style="object-fit:cover;width:100%;height:100%;" alt="">
+                                                                </div>
+                                                                <div class="container-fluid mx-auto mt-4 mt-md-0" style="width: min-content;">
+                                                                    <h3 class="px-3 ps-md-0" style="font-size: 30px;">{{creator.first_name|default_if_none:""}}</h3>
+                                                                    <h6 class="text-black-50 fw-light text-center text-md-start">{{creator.userinfos.city|default_if_none:""}}, {{creator.userinfos.country|default_if_none:""}}</h6>
+                                                                </div>
+                                                            </div>
+                                                            <div class="container-fluid mt-5 p-0">
+                                                                <h4>Creator bio</h4>
+                                                                <p class="text-black-50 mb-0 lh-sm fs-5">{{creator.userinfos.userinfo|default_if_none:""}}</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="offcanvas-body px-0 py-0 px-sm-3" style="height: max-content;">
+                                                        <hr class="my-5">
+                                                        <div class="container-fluid mb-5 ms-md-2 p-0">
+                                                            <h4 class="mb-5">Recent jobs</h4>
+                                                            <div class="d-flex mt-3 align-items-center">
+                                                                <div class="container-fluid position-relative p-0">
+                                                                    <button class="btn bg-white shadow-lg position-absolute d-flex me-1 align-items-center end-0 border-0 translate-middle-y rounded rounded-circle z-1" style="height: 40px;width:40px;top:46%;" id="scroll-btn"><span class="material-symbols-outlined fs-6">arrow_forward_ios</span></button>
+                                                                <div class="d-flex gap-2 pb-2 overflow-x-scroll" id="scroll-div">
+                                                                    {% for video in creator.userinfos.videos.all %}
+                                                                        {% if video.video_status == 'previous_works' %}
+                                                                            <button type="button" class="btn border-0 p-0" data-bs-toggle="modal" data-bs-target="#videoModal{{video.id|default_if_none:""}}">
+                                                                                <!-- Video Container -->
+                                                                                <div class="video-container position-relative rounded shadow-sm rounded-3 overflow-hidden d-flex align-items-center" style="width: 165px;height:250px;" data-toggle="modal" data-target="#videoModal{{video.id|default_if_none:""}}">
+                                                                                    <video muted class="w-100 overflow-hidden" style="object-fit: cover;width:100%;height:100%;">
+                                                                                        <source src="{{video.video_file.url|default_if_none:""}}" type="video/mp4">
+                                                                                        Your browser does not support the video tag.
+                                                                                    </video>
+                                                                                    <span class="material-symbols-outlined position-absolute play-button" style="font-variation-settings: 'FILL'1,'wght'700,'GRAD'200,'opsz'24;font-size: 30px;">
+                                                                                        play_circle
+                                                                                        </span>
+                                                                                </div>
+                                                                            </button>
+                                                                            <!-- Video Modal -->
+                                                                            <div class="modal video-modal fade" id="videoModal{{ video.id|default_if_none:""}}" tabindex="-1" aria-labelledby="contentLabel{{ video.id|default_if_none:""}}" aria-hidden="true">
+                                                                                <div class="modal-dialog modal-dialog-centered">
+                                                                                    <div class="modal-content rounded rounded-4 overflow-hidden bg-transparent video-modal-content">
+                                                                                        <div class="modal-body bg-black p-0 video-modal-body">
+                                                                                            <video controls id="contentPlayer{{ video.id|default_if_none:""}}" class="w-100 overflow-hidden video-element" controlslist="nodownload">
+                                                                                                <source src="{{ video.video_file.url|default_if_none:""}}" type="video/mp4">
+                                                                                                Your browser does not support the video tag.
+                                                                                            </video>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <!-- video player script -->
+                                                                            <script>
+                                                                                // Function to pause and reset video
+                                                                                function stopVideo(videoElement) {
+                                                                                    if (videoElement) {
+                                                                                        videoElement.pause();
+                                                                                        videoElement.currentTime = 0;
+                                                                                    }
+                                                                                }
+
+                                                                                    (function() {
+                                                                                        // Select the modal
+                                                                                        let modal = document.getElementById('videoModal{{ video.id|default_if_none:""}}');
+                                                                                        let videoElement = document.getElementById('contentPlayer{{ video.id|default_if_none:""}}');
+
+                                                                                        // Create an observer to watch for changes in the modal's style attribute
+                                                                                        let observer = new MutationObserver(function(mutations) {
+                                                                                            mutations.forEach(function(mutation) {
+                                                                                                if (mutation.attributeName === "style") {
+                                                                                                    let displayStyle = window.getComputedStyle(modal).display;
+                                                                                                    if (displayStyle === 'none') {
+                                                                                                        stopVideo(videoElement);
+                                                                                                    }
+                                                                                                }
+                                                                                            });
+                                                                                        });
+
+                                                                                        // Start observing the modal for attribute changes
+                                                                                        observer.observe(modal, { attributes: true });
+                                                                                    })();
+                                                                            </script>
+
+                                                                        
+                                                                        {% endif %}
+                                                                    {% endfor %}
+                                                                </div>
+                                                            </div>        
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            {% endif %}
+                                            {% endfor %}
+                                        </div>          
+                                </div>                                             
+                            <!-- approved -->
+                            <div class="tab-pane fade shadow-sm w-100 bg-white rounded rounded-2 py-5 px-3" id="approved" role="tabpanel" aria-labelledby=" approved-tab" tabindex="0">
+                                <div class="row row-cols-12 row-cols-md-3 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-6 g-3 mx-auto">
+                                    {% if order.applied_creator %}
+                                    <div class="col d-sm-block d-flex justify-content-center applicants">
+                                        <div class="card border-0" style="min-width: 150px;max-width: 250px;box-shadow: 0px 1px 5px #0000002d;">
+                                            <div class="card-body d-flex align-items-center justify-content-between">
+                                                <div>
+                                                    <h6 class="card-title mb-0 d-flex align-items-center gap-4 justify-content-between mb-1" style="font-size: small;">{{order.applied_creator.user.first_name|default_if_none:""}}<span class="badge rounded rounded-2 px-2 py-1" style="background-color: rgba(214, 201, 255, 0.497);color:#490efb9f;font-size:small;">invited</span></h6>
+                                                    <small class="text-secondary m-0 d-flex align-items-center gap-1" style="font-size: small;">{{order.applied_creator.city|default_if_none:""}}, {{order.applied_creator.country|default_if_none:""}} <span style="font-size: smaller;">({{order.applied_creator.gender|default_if_none:""}})</span></small>
+                                                </div>
+                                                <div class="dropdown">
+                                                    <span class="material-symbols-outlined" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    more_vert
+                                                    </span>
+                                                    <ul class="dropdown-menu">
+                                                        <li><button class="dropdown-item d-flex align-items-center gap-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#approved_profile{{order.applied_creator.id|default_if_none:""}}" aria-controls="#approved_profile{{order.applied_creator.id|default_if_none:""}}"><span class="material-symbols-outlined">account_circle</span>see portfolio</button></li>
+                                                        {% if order.unable_to_disapprove_creator == False %}
+                                                            <li><a class="dropdown-item d-flex align-items-center gap-2" href="{% url 'brands_disapprovingcreator' order.id order.applied_creator.id %}"><span class="material-symbols-outlined">block</span>cancel approval</a></li>
+                                                        {% endif %}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div class="overflow-hidden d-flex align-items-center rounded rounded-3 mx-2 mb-2 shadow-sm" style="height: 180px;">
+                                                <button class="border-0 p-0 m-0" type="button" style="width: inherit;height:inherit;" data-bs-toggle="offcanvas" data-bs-target="#approved_profile{{order.applied_creator.id|default_if_none:""}}" aria-controls="creator_profile">
+                                                    <img src="{{order.applied_creator.user_profile.url|default_if_none:""}}" style="height:100%;width:100%;object-fit:cover;" alt="...">
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>    
+                                    <!-- offcanvas creator profile -->
+                                    <div class="offcanvas mt-0 offcanvas-end overflow-auto" style="width: 35rem;z-index:5000;" tabindex="-1" id="approved_profile{{order.applied_creator.id|default_if_none:""}}" aria-labelledby="creator_profileLabel">
+                                        <div class="d-flex justify-content-end pt-3">
+                                            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                                        </div>
+                                        <div>
+
+                                            <div class="offcanvas-header text-start p-0">
+                                                <div class="">
+                                                    <div class="d-block justify-content-center mx-auto mx-md-0 d-md-flex align-items-center gap-3 my-4" style="width:fit-content;">
+                                                        <div class="rounded rounded-circle overflow-hidden d-flex align-items-center justify-content-center" style="height: 150px;width: 150px;">
+                                                            <img src="{{order.applied_creator.user_profile.url|default_if_none:""}}" style="object-fit:cover;width:100%;height:100%;" alt="">
+                                                        </div>
+                                                        <div class="container-fluid mx-auto mt-4 mt-md-0" style="width: min-content;">
+                                                            <h3 class="px-3 ps-md-0" style="font-size: 30px;">{{order.applied_creator.user.first_name|default_if_none:""}}</h3>
+                                                            <h6 class="text-black-50 fw-light text-center text-md-start">{{order.applied_creator.city|default_if_none:""}}, {{order.applied_creator.country|default_if_none:""}}</h6>
+                                                        </div>
+                                                    </div>
+                                                    <div class="container-fluid mt-5 p-0">
+                                                        <h4>Creator bio</h4>
+                                                        <p class="text-black-50 mb-0 lh-sm fs-5">{{order.applied_creator.userinfo|default_if_none:""}}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="offcanvas-body px-0 py-0 px-sm-3 overflow-hidden">
+                                                <hr class="my-5">
+                                                <div class="container-fluid mb-5 ms-md-2 p-0">
+                                                    <h4 class="mb-5">Recent jobs</h4>
+                                                    <div class="d-flex mt-3 align-items-center">
+                                                        <div class="container-fluid position-relative p-0">
+                                                            <button class="btn bg-white shadow-lg position-absolute d-flex me-1 align-items-center end-0 border-0 translate-middle-y rounded rounded-circle z-1" style="height: 40px;width:40px;top:46%;" id="scroll-btn"><span class="material-symbols-outlined fs-6">arrow_forward_ios</span></button>
+                                                        <div class="d-flex gap-2 pb-2 overflow-x-scroll" id="scroll-div">
+                                                            {% for video in order.applied_creator.videos.all %}
+                                                                {% if video.video_status == 'previous_works' %}
+                                                                    <button type="button" class="btn border-0 p-0" data-bs-toggle="modal" data-bs-target="#approved_creator{{video.id|default_if_none:""}}">
+                                                                        <!-- Video Container -->
+                                                                        <div class="video-container position-relative rounded shadow-sm rounded-3 overflow-hidden d-flex align-items-center" style="width: 165px;height:250px;" data-toggle="modal" data-target="#approved_creator{{video.id|default_if_none:""}}">
+                                                                            <video muted class="w-100 overflow-hidden" style="object-fit: cover;width:100%;height:100%;">
+                                                                                <source src="{{video.video_file.url|default_if_none:""}}" type="video/mp4">
+                                                                                Your browser does not support the video tag.
+                                                                            </video>
+                                                                            <span class="material-symbols-outlined position-absolute play-button" style="font-variation-settings: 'FILL'1,'wght'700,'GRAD'200,'opsz'24;font-size: 30px;">
+                                                                                play_circle
+                                                                                </span>
+                                                                        </div>
+                                                                    </button>
+                                                                    <!-- Video Modal -->
+                                                                    <div class="modal video-modal fade" id="approved_creator{{ video.id|default_if_none:""}}" tabindex="-1" aria-labelledby="contentLabel{{ video.id|default_if_none:""}}" aria-hidden="true">
+                                                                        <div class="modal-dialog modal-dialog-centered">
+                                                                            <div class="modal-content rounded rounded-4 overflow-hidden bg-transparent video-modal-content">
+                                                                                <div class="modal-body bg-black p-0 video-modal-body">
+                                                                                    <video controls id="approved_creator_element{{ video.id|default_if_none:""}}" class="w-100 overflow-hidden video-element" controlslist="nodownload">
+                                                                                        <source src="{{ video.video_file.url|default_if_none:""}}" type="video/mp4">
+                                                                                        Your browser does not support the video tag.
+                                                                                    </video>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- video player script -->
+                                                                    <script>
+                                                                        // Function to pause and reset video
+                                                                        function stopVideo(videoElement) {
+                                                                            if (videoElement) {
+                                                                                videoElement.pause();
+                                                                                videoElement.currentTime = 0;
+                                                                            }
+                                                                        }
+
+                                                                            (function() {
+                                                                                // Select the modal
+                                                                                let modal = document.getElementById('approved_creator{{ video.id|default_if_none:""}}');
+                                                                                let videoElement = document.getElementById('approved_creator_element{{ video.id|default_if_none:""}}');
+
+                                                                                // Create an observer to watch for changes in the modal's style attribute
+                                                                                let observer = new MutationObserver(function(mutations) {
+                                                                                    mutations.forEach(function(mutation) {
+                                                                                        if (mutation.attributeName === "style") {
+                                                                                            let displayStyle = window.getComputedStyle(modal).display;
+                                                                                            if (displayStyle === 'none') {
+                                                                                                stopVideo(videoElement);
+                                                                                            }
+                                                                                        }
+                                                                                    });
+                                                                                });
+
+                                                                                // Start observing the modal for attribute changes
+                                                                                observer.observe(modal, { attributes: true });
+                                                                            })();
+                                                                    </script>
+
+                                                                
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </div>
+                                                    </div>        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                                                    
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                </div>
+            <!-- Content -->
+            <div class="tab-pane fade bg-white my-4 rounded rounded-2 px-3 shadow-sm" id="underline-content" role="tabpanel" aria-labelledby="underline-content-tab" tabindex="0">    
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5 g-3 my-5 py-5 mx-auto">
+                    {% for video in order.videos.all %}
+                        <!-- content-card -->
+                        <div class="col d-sm-block d-flex justify-content-center applicants">
+                            <div class="card border-0 px-2" style="max-width: 250px;box-shadow: 0px 1px 5px #0000002d;">
+                                <div class="card-body d-flex align-items-center gap-2 px-0">
+                                    <div class="rounded rounded-circle overflow-hidden" style="width:35px;height:35px;">
+                                        <img src="{{video.user.user_profile.url|default_if_none:""}}" style="object-fit:cover;width:100%;height:100%;" class="" alt="...">
+                                    </div>
+                                    <h6 class="m-0" style="font-size: small;"> {{video.user.user.first_name|default_if_none:""}} {{video.user.user.last_name|default_if_none:""}} </h6>
+                                </div>
+                                <div class="overflow-hidden order-details-content-video d-flex align-items-center justify-content-center rounded rounded-1 mb-2 shadow-sm" style="height: 270px;max-width:234px;">
+                                    <button class="btn p-0 bg-transparent z-0 border-0" id="fly" style="width: inherit;height:inherit;" data-bs-toggle="modal" data-bs-target="#content{{video.id|default_if_none:""}}">
+                                        <video class="rounded" style="object-fit: cover;width:100%;height:100%;">
+                                        <source src="{{video.video_file.url|default_if_none:""}}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                        </video>
+                                        <span class="material-symbols-outlined position-absolute top-50 start-50 translate-middle text-white" style="font-variation-settings: 'FILL'1,'wght'700,'GRAD'200,'opsz'24;font-size: 45px;">
+                                            play_circle
+                                            </span>
+                                    </button>
+                                </div>
+                                {% if video.video_status is None %}
+                                    <div class="card-body row g-1 row-cols-2 px-0">
+                                        <div class="col-7">
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#request-edits" class="btn fw-bold col-12 rounded-1 px-0 bg-transparent border border-2" style="background-color: #4a0efb;font-size:small;">Request edits</button>
+                                        </div>
+                                        <div class="col-5">
+                                            <a href="{% url 'brands_videoapproval' order.id video.id %}" class="btn rounded-1 col-12 fw-bold text-light px-0" style="background-color: #4a0efb;font-size:small;">Approve</a>
+                                        </div>
+                                    </div>    
+                                {% else %}
+                                <a href="{{ video.video_file.url|default_if_none:""}}" download="{{ video.video_file.name|default_if_none:""}}" class="btn text-white rounded rounded-pill mb-2 text-center w-75 mx-auto d-flex align-items-center justify-content-center" style="background-color: #4A0EFB;">
+                                    Download <span class="material-symbols-outlined">download</span>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>   
+                        <!-- Video Modal -->
+                        <div class="modal video-modal fade" id="content{{ video.id|default_if_none:""}}" tabindex="-1" aria-labelledby="contentLabel{{ video.id|default_if_none:""}}" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content rounded rounded-4 overflow-hidden bg-transparent video-modal-content">
+                                    <div class="modal-body bg-black p-0 video-modal-body">
+                                        <video controls id="video_content_player{{ video.id|default_if_none:""}}" class="w-100 overflow-hidden video-element" controlslist="nodownload">
+                                            <source src="{{ video.video_file.url|default_if_none:""}}" type="video/mp4">
+                                            Your browser does not support the video tag.
+                                        </video>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- video player script -->
+                        <script>
+                            // Function to pause and reset video
+                            function stopVideo(videoElement) {
+                                if (videoElement) {
+                                    videoElement.pause();
+                                    videoElement.currentTime = 0;
+                                }
+                            }
+
+                                (function() {
+                                    // Select the modal
+                                    let modal = document.getElementById('content{{ video.id|default_if_none:""}}');
+                                    let videoElement = document.getElementById('video_content_player{{ video.id|default_if_none:""}}');
+
+                                    // Create an observer to watch for changes in the modal's style attribute
+                                    let observer = new MutationObserver(function(mutations) {
+                                        mutations.forEach(function(mutation) {
+                                            if (mutation.attributeName === "style") {
+                                                let displayStyle = window.getComputedStyle(modal).display;
+                                                if (displayStyle === 'none') {
+                                                    stopVideo(videoElement);
+                                                }
+                                            }
+                                        });
+                                    });
+
+                                    // Start observing the modal for attribute changes
+                                    observer.observe(modal, { attributes: true });
+                                })();
+                        </script> 
+                                      
+                    {% endfor %}
+
+
+                </div>
+        </div>
+            <!-- Delivery -->
+            <div class="tab-pane fade" id="underline-delivery" role="tabpanel" aria-labelledby="underline-delivery-tab" tabindex="0">    
+                <div class="shadow-sm bg-white py-4 my-5">
+                    <h5 class="mx-3">Creator</h5>
+                    <hr class="m-0 text-secondary fw-bold bg-secondary" size="4px">
+                    <div class=" py-4 px-3 d-flex align-items-center justify-content-between col-12 col-md-12 col-lg-8 col-xxl-6">
+                        <div class="">
+                            <h6>{{order.applied_creator.user.first_name|default_if_none:""}}</h6>
+                            <div class="d-flex align-items-center gap-2 justify-content-between">
+                                <small class="d-flex align-items-center justify-content-evenly text-muted" style="font-size: small;"><span class="material-symbols-outlined" style="font-size: small;">person_pin_circle</span>{{order.applied_creator.city|default_if_none:""}}</small>
+                                {% if order.tracking_nums.all %}
+                                {% for tracking_data in order.tracking_nums.all %}
+                                    {% if not tracking_data.tracking_num and not tracking_data.shipping_carrier %}
+                                        <small class="text-muted d-flex align-items-center justify-content-evenly" style="font-size: small;"><span class="material-symbols-outlined text-danger p-0" style="font-variation-settings: 'FILL'1;font-size:small;">circle</span>Requiring delivery</small>
+                                    {% else %}
+                                        <small class="text-muted d-flex align-items-center justify-content-evenly" style="font-size: small;"><span class="material-symbols-outlined text-warning p-0" style="font-variation-settings: 'FILL'1;font-size:small;">circle</span>Out for delivery</small>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+
+                            </div>
+                        </div>
+                        {% if order.tracking_nums.all %}
+                        {% for tracking_data in order.tracking_nums.all %}
+                            {% if not tracking_data.tracking_num and not tracking_data.shipping_carrier %}
+                                    <button class="btn btn-transparent border-1 p-1 fs-6 px-sm-5" data-bs-toggle="modal" data-bs-target="#add_tracking{{order.id|default_if_none:""}}" style="border: solid 1px rgb(59, 5, 251);color:rgb(59, 5, 251);">Add tracking</button>
+                                {% else %}
+                                    <button class="btn btn-transparent border-1 p-1 fs-6 px-sm-5" data-bs-toggle="modal" data-bs-target="#add_tracking{{order.id|default_if_none:""}}" style="border: solid 1px rgb(59, 5, 251);color:rgb(59, 5, 251);">Edit tracking</button>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+
+                    </div>
+
+                <div class="modal fade" id="add_tracking{{order.id|default_if_none:""}}" tabindex="-1" aria-labelledby="add_trackingLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 rounded rounded-1" style="max-width: 410px;">
+                        <div class="modal-header mx-3 border-0 px-0">
+                            <h1 class="modal-title fs-4 fw-bold" style="font-size: 21px;" id="add_trackingLabel">Product Delivery</h1>
+                        </div>
+                        <hr class="m-0 text-secondary col-11 mx-auto fw-bold bg-secondary" size="4px">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="modal-body">
+                                <h6 class="fw-normal my-0 text-secondary"> {{order.applied_creator.user.first_name|default_if_none:""}} {{order.applied_creator.user.last_name|default_if_none:""}} </h6>
+                                <h6 class="fw-normal my-0 text-secondary"> {{order.applied_creator.address|default_if_none:""}} </h6>
+                                <h6 class="fw-normal mb-3 text-secondary"> {{order.applied_creator.postalcode|default_if_none:""}} </h6>
+                                <!-- hidden input form detection -->
+                                <input type="hidden" name="form_type" value="delivery_info">
+                                <div class="form-floating mb-3">
+                                    {% for tracking_data in order.tracking_nums.all %}
+                                    <input name="tracking_num" value="{{tracking_data.tracking_num|default_if_none:""|default_if_none:""}}" type="number" class="form-control rounded rounded-1 border-0" style="background-color: rgb(238, 240, 244);" id="tracking_num" placeholder="Tracking_num">
+                                    <label for="tracking_num" style="color: rgb(99	101	106) !important;">Tracking number</label>                                    
+                                    
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input name="shipping_carrier" value="{{tracking_data.shipping_carrier|default_if_none:""|default_if_none:""}}" type="text" class="form-control rounded rounded-1 border-0" style="background-color: rgb(238, 240, 244);" id="Shipping_carrier" placeholder="Shipping carrier">
+                                    <label for="Shipping_carrier" style="color: rgb(99	101	106) !important;">Shipping carrier</label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <hr class="m-0 text-secondary col-11 mx-auto fw-bold bg-secondary" size="4px">
+                        <div class="modal-footer border-top-0 d-flex jusitfy-content-center">
+                            <button type="button" class="btn btn-light px-1 flex-grow-1 text-dark border-0" style="background-color: rgb(225	227	233);" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary px-1 flex-grow-1" style="background-color: rgb(59, 5, 251);">Save</button>
+                        </div>
+                    </form>
+                    </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+        
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,163 @@
+/* General Styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #F0F2F5; 
+    position: relative;
+  }
+  
+  /* Profile Picture Styling */
+  .profile-picture {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+  }
+  
+  /* Button Styling */
+  .edit-btn {
+    font-size: 0.875rem;
+    padding: 0.4rem 0.8rem;
+  }
+  
+  .navbar-white.navbar{
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }  
+
+  /* Recent Works */
+  .recent-work-image {
+    object-fit: cover;
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+  }
+  .bg-color{
+    background-color: #3800fa;
+  }
+  .text-color{
+    color: rgb(69	0	250);
+  }
+  .delete-btn {
+    z-index: 500;
+    /* opacity: 0;
+    transition: opacity 0.3s ease-in-out; */
+  }
+/*   
+  .position-relative:hover .delete-btn {
+    opacity: 1;
+  } */
+  
+  #withdraw_modal .modal-body a:hover{
+    background-color: #b0aeae20;
+  }
+  
+  /* File Upload Label */
+  .upload-label {
+    background-color: #f8f9fa;
+    cursor: pointer;
+  }
+  
+  .upload-label:hover {
+    background-color: #e9ecef;
+  }
+  .active-element{
+    color: #4A0EFB;
+  }
+  .form-check-input:checked + label {
+    /* styles here will be applied to the label when the radio input is checked */
+    border: 1px solid #4A0EFB;
+    background-color: #cccccc4d;
+    color: #4A0EFB;
+    font-weight: bold;
+    border-radius: 0px;
+    }
+    #tiktok_link, #insta_link{
+        width: 100%;
+    }
+
+ .offcanvas#job_details {
+  width: 100%;
+}
+.nav-underline .active {
+  color: #4A0EFB !important;
+}
+.nav-underline .nav-link:hover {
+  color: #4A0EFB !important;
+}
+.paypal-email::placeholder {
+  color: rgb(149, 148, 148); /* Change this to your desired color */
+  opacity: 1; /* Optional: Set opacity to 1 for full visibility */
+}
+.order-data{
+  font-size: .7rem;
+}
+.text-limit{
+  width:140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+@media (min-width: 576px) {
+  .order-data{
+    font-size: .9rem;
+  }
+  
+  .profile-img {
+    width: 210px;
+    height: 210px;
+  }
+  #tiktok_link, #insta_link{
+    width: 150%;
+  }
+  .offcanvas#job_details {
+   width: 27%;
+  }
+  .text-limit{
+    width: auto;
+    white-space: wrap;
+  }
+}
+
+@media (min-width: 768px) {
+  .profile-img {
+        width: 235px;
+        height: 235px;
+      }
+    #tiktok_link, #insta_link{
+        width: 200%;
+    }
+    .container .row .container-fluid {
+      width: 48%;
+    }
+    .offcanvas#job_details {
+     width: 30%;
+    }
+  }
+
+  @media (min-width: 992px) {
+    .profile-img {
+      width: 260px;
+      height: 260px;
+    }
+    
+  }
+  @media (min-width: 1024px) {
+  .offcanvas#job_details {
+   width: 30%;
+  }
+
+}
+/* @media (min-width: 1200px) {
+  .profile-img {
+width: 260px;
+height: 260px;
+  }
+}
+@media (min-width: 1400px) {
+  .profile-img {
+    width: 260px;
+    height: 260px;
+  }
+} */

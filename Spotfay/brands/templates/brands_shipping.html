@@ -1,0 +1,214 @@
+{% extends 'brands_base.html' %}
+{% load static %}
+{% block title %}shipments{% endblock %}
+{% block page_content %}
+
+{% if shipments %}
+<div class="col-12 col-sm-9 m-auto shadow-sm bg-white py-4 mt-5">
+    <h5 class="mx-3">Creator</h5>
+    {% for shipment in shipments|slice:"::-1" %}
+    <hr class="m-0 text-secondary fw-bold bg-secondary" size="4px">
+    <div class=" py-4 px-3 d-flex align-items-center justify-content-between col-12 col-md-12 col-lg-8 col-xxl-6">
+        <div class="">
+            <h6>{{shipment.applied_creator.user.first_name}} {{shipment.applied_creator.user.last_name}}</h6>
+            <div class="d-flex align-items-center gap-2 justify-content-between">
+                <small class="d-flex align-items-center justify-content-evenly text-muted" style="font-size: small;"><span class="material-symbols-outlined" style="font-size: small;">person_pin_circle</span>{{shipment.applied_creator.country}}</small>
+                {% for shipping_data in shipment.tracking_nums.all|slice:"::-1" %}
+                    {% if shipping_data.tracking_num and shipping_data.shipping_carrier %}
+                        <small class="text-muted d-flex align-items-center justify-content-evenly" style="font-size: small;"><span class="material-symbols-outlined text-warning p-0" style="font-variation-settings: 'FILL'1;font-size:small;">circle</span>Out for delivery</small>
+                    {% else %}
+                        <small class="text-muted d-flex align-items-center justify-content-evenly" style="font-size: small;"><span class="material-symbols-outlined text-danger p-0" style="font-variation-settings: 'FILL'1;font-size:small;">circle</span>Requiring delivery</small>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% for shipping_data in shipment.tracking_nums.all|slice:"::-1" %}
+            {% if shipping_data.tracking_num and shipping_data.shipping_carrier %}
+                <button class="btn btn-transparent border-1 p-1 fs-6 px-sm-5" data-bs-toggle="modal" data-bs-target="#add_tracking{{shipment.id}}" style="border: solid 1px rgb(59, 5, 251);color:rgb(59, 5, 251);">Edit tracking</button>
+                {% else %}
+                <button class="btn btn-transparent border-1 p-1 fs-6 px-sm-5" data-bs-toggle="modal" data-bs-target="#add_tracking{{shipment.id}}" style="border: solid 1px rgb(59, 5, 251);color:rgb(59, 5, 251);">Add tracking</button>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <div class="modal fade" id="add_tracking{{shipment.id}}" tabindex="-1" aria-labelledby="add_trackingLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded rounded-1" style="max-width: 410px;">
+            <div class="modal-header mx-3 border-0 px-0">
+                <h1 class="modal-title fs-4 fw-bold" style="font-size: 21px;" id="add_trackingLabel">Product Delivery</h1>
+            </div>
+            <hr class="m-0 text-secondary col-11 mx-auto fw-bold bg-secondary" size="4px">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <h6 class="fw-normal my-0 text-secondary"> {{shipment.applied_creator.user.first_name}} {{shipment.applied_creator.user.last_name}} </h6>
+                    <h6 class="fw-normal my-0 text-secondary"> {{shipment.applied_creator.address}} </h6>
+                    <h6 class="fw-normal mb-3 text-secondary"> {{shipment.applied_creator.postalcode}} </h6>
+                    <!-- hidden input form detection -->
+                    <input type="hidden" name="order_id" value="{{shipment.id}}">
+                    {% for tracking_data in shipment.tracking_nums.all %}
+                        {% if tracking_data.tracking_num and tracking_data.shipping_carrier %}
+                            <div class="form-floating mb-3">
+                                <input name="tracking_num" value="{{tracking_data.tracking_num}}" type="number" class="form-control rounded rounded-1 border-0" style="background-color: rgb(238, 240, 244);" id="tracking_num" placeholder="Tracking_num">
+                                <label for="tracking_num" style="color: rgb(99	101	106) !important;">Tracking number</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input name="shipping_carrier" value="{{tracking_data.shipping_carrier}}" type="text" class="form-control rounded rounded-1 border-0" style="background-color: rgb(238, 240, 244);" id="Shipping_carrier" placeholder="Shipping carrier">
+                                <label for="Shipping_carrier" style="color: rgb(99	101	106) !important;">Shipping carrier</label>
+                            </div>         
+                        {% else %}
+                            <div class="form-floating mb-3">
+                                <input name="tracking_num" value="" type="number" class="form-control rounded rounded-1 border-0" style="background-color: rgb(238, 240, 244);" id="tracking_num" placeholder="Tracking_num">
+                                <label for="tracking_num" style="color: rgb(99	101	106) !important;">Tracking number</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input name="shipping_carrier" value="" type="text" class="form-control rounded rounded-1 border-0" style="background-color: rgb(238, 240, 244);" id="Shipping_carrier" placeholder="Shipping carrier">
+                                <label for="Shipping_carrier" style="color: rgb(99	101	106) !important;">Shipping carrier</label>
+                            </div>                                 
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <hr class="m-0 text-secondary col-11 mx-auto fw-bold bg-secondary" size="4px">
+            <div class="modal-footer border-top-0 d-flex jusitfy-content-center">
+            <button type="button" class="btn btn-light px-1 flex-grow-1 text-dark border-0" style="background-color: rgb(225	227	233);" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary px-1 flex-grow-1" style="background-color: rgb(59, 5, 251);">Save</button>
+            </div>
+        </form>
+        </div>
+        </div>
+    </div>
+    
+    {% endfor %}
+  </div>
+
+{% else %}
+<!-- empty_shipments_contnent -->
+    <div class="empty_shipments_contnent">
+        <style>
+            body{
+                position: relative;
+            }
+        
+            .content-container{
+                position: absolute;
+                top:50%;
+                left:50%;
+                transform: translate(-49%,15%);
+                width: 200px;
+            }
+        .background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: -1;
+        }
+        
+        .circle {
+            position: absolute;
+            border: 1px solid rgba(0, 0, 0, 0.128);
+            border-radius: 50%;
+            opacity: 1;
+        }
+        
+        .circle:nth-child(1) {
+            width: 10rem;
+            height: 10rem;
+            transform: scale(1);
+        }
+        
+        .circle:nth-child(2) {
+            width: 12rem;
+            height: 12rem;
+            transform: scale(1);
+        }
+        
+        .circle:nth-child(3) {
+            width: 14rem;
+            height: 14rem;
+            transform: scale(1);
+        }
+        
+        .circle:nth-child(4) {
+            width: 16rem;
+            height: 16rem;
+            transform: scale(1);
+        }
+        
+        .circle:nth-child(5) {
+            width: 18rem;
+            height: 18rem;
+            transform: scale(1);
+        }
+        
+        .circle:nth-child(6) {
+            width: 20rem;
+            height: 20rem;
+            transform: scale(1);
+        }
+        
+        .circle:nth-child(7) {
+            width: 22rem;
+            height: 22rem;
+            transform: scale(1);
+        }
+        
+        .circle:nth-child(8) {
+            width: 24rem;
+            height: 24rem;
+            transform: scale(1);
+        }
+        
+        .circle:nth-child(9) {
+            width: 26rem;
+            height: 26rem;
+            transform: scale(1);
+        }
+        
+        .circle:nth-child(10) {
+            width: 28rem;
+            height: 28rem;
+            transform: scale(1);
+        }
+        
+        .circle:nth-child(11) {
+            width: 30rem;
+            height: 30rem;
+            transform: scale(1);
+        }
+        
+        .circle:nth-child(12) {
+            width: 32rem;
+            height: 32rem;
+            transform: scale(1);
+        }
+        </style>
+        <div class="background m-auto overflow-hidden">
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="circle"></div>
+        
+        </div>
+        <div class="content" style="width: 100%;height:100vh;">
+            <div class="d-flex align-items-center flex-column content-container">
+                <span class="material-symbols-outlined mb-4 text-center" style="font-variation-settings: 'FILL'1;font-size: 70px;">group</span>
+                <h5 class="mb-4">No campaigns yet</h5>
+                <button class="btn btn-transparent d-flex align-items-center gap-2 justify-content-center rounded-pill" onclick="window.location.reload()" style="border: solid 1.5px rgb(59, 5, 251);color: rgb(59, 5, 251);backdrop-filter: blur(50px);"><span class="material-symbols-outlined">refresh</span>Refresh</button>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+
+{% endblock %}

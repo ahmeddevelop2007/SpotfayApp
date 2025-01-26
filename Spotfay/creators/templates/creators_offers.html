@@ -1,0 +1,114 @@
+{% extends 'creators_base.html' %}
+{% block page_title %}offers{% endblock %}
+{% block page_content %}
+<!-- Modify the script to use the toast -->
+
+{% if messages %}
+  {% for message in messages %}
+    <!-- Toast container -->
+    <div id="toast-container" class="position-fixed bottom-0 end-0 p-3" style="z-index: 11; visibility: visible;">
+      <!-- Toast -->
+      <div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+          <strong class="me-auto" style="font-size: small;">{{message}}</strong>
+        </div>
+        <div class="toast-body d-flex align-items-center gap-2">
+          <a href="{% url 'creators_profile' %}" style="background-color: #2800f9;font-size:smaller;" class="btn btn-primary d-flex align-items-center">View Profile <span class="material-symbols-outlined fs-6">arrow_forward</span></a>
+          <button type="button" class="btn border border-1 border-dark" style="font-size:smaller" data-bs-dismiss="toast" aria-label="Close">Close</button>
+        </div>
+      </div>
+    </div>    {% endfor %}
+    {% endif %}
+    
+    <script>
+      // Get the toast element
+      const toast = document.getElementById('toast');
+
+      // Show the toast on page load
+      document.addEventListener('DOMContentLoaded', () => {
+        // Initialize the toast
+        const toastInstance = new bootstrap.Toast(toast);
+
+        // Show the toast
+        toastInstance.show();
+
+        // Hide the toast after 5 seconds
+        setTimeout(() => {
+          toastInstance.hide();
+        }, 5000);
+      });
+    </script>
+
+    
+  <!-- content -->
+  <div class="container pt-1 mt-5">
+    <h3 class="ms-2 mb-4">Offers you might like</h3>
+    <!-- offers -->
+    <div class="container-fluid d-flex p-0 jobs-container gap-0 flex-wrap">
+      <!-- Render the first 2 jobs normally -->
+    </div>
+
+    <!-- Container for dynamically loaded jobs -->
+    <div id="dynamic-jobs-container" class="container-fluid d-flex p-0 jobs-container gap-0 flex-wrap" style="margin-bottom: 100px;"></div>
+
+    <!-- Loader for infinite scrolling -->
+    <div id="loader" class="text-center my-3" style="display: none;">
+      <div class="spinner-grow" style="color: #2800f9;" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Infinite scrolling script -->
+<script>
+  let page = 1; // Track the current page
+  let isLoading = false; // Prevent multiple AJAX requests
+
+  // Function to load more jobs
+  function loadMoreJobs() {
+    if (isLoading) return; // Prevent multiple requests
+    isLoading = true;
+
+    // Show loader
+    document.getElementById('loader').style.display = 'block';
+
+    // Send AJAX request to the backend
+    fetch(`/creators/load_more_jobs/?page=${page}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.has_more) {
+          // Append new jobs to the container
+          const container = document.getElementById('dynamic-jobs-container');
+          container.innerHTML += data.html;
+          page++; // Increment page for the next request
+        } else {
+          // No more jobs to load
+          document.getElementById('loader').style.display = 'none';
+          return;
+        }
+        isLoading = false;
+      })
+      .catch(error => {
+        console.error('Error loading more jobs:', error);
+        isLoading = false;
+      });
+  }
+
+  // Infinite scroll event listener
+  window.addEventListener('scroll', () => {
+    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+    if (scrollTop + clientHeight >= scrollHeight - 100) {
+      console.log('hello')
+      loadMoreJobs();
+    }
+  });
+
+  // Load the first set of dynamic jobs on page load, but don't show the loader
+  document.addEventListener('DOMContentLoaded', () => {
+    loadMoreJobs();
+    document.getElementById('loader').style.display = 'none';
+  });
+</script>
+
+
+{% endblock %}

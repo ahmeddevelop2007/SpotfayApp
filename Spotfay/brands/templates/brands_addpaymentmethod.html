@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manage Payment Methods</title>
+    <script src="https://js.stripe.com/v3/"></script>
+</head> 
+<body> 
+    <h1>Manage Payment Methods</h1> 
+    <form id="payment-method-form" action="{% url 'brands_addpaymentmethod' %}" method="post">
+        {% csrf_token %}
+        <h2>Existing Payment Methods</h2>
+        <ul>
+            {% for payment_method in payment_methods %}
+                <li>
+                    {{ payment_method.card_type }} ending in {{ payment_method.last4 }} ({{ payment_method.exp_month }}/{{ payment_method.exp_year }})
+                </li>
+            {% endfor %}
+        </ul>
+
+        <h2>Add a New Card</h2>
+        <label for="card-holder-name">Card Holder's Name:</label>
+        <input type="text" id="card-holder-name" name="card_holder_name" required>
+        <div id="card-element"></div>
+
+        <button type="submit">Save Card</button>
+    </form>
+
+    <script>
+        var stripe = Stripe('{{ stripe_publishable_key }}');
+        var elements = stripe.elements();
+        var card = elements.create('card');
+        card.mount('#card-element');
+
+        var form = document.getElementById('payment-method-form');
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            stripe.createToken(card, {
+                name: document.getElementById('card-holder-name').value
+            }).then(function(result) {
+                if (result.error) {
+                    console.log(result.error.message);
+                } else {
+                    var hiddenInput = document.createElement('input');
+                    hiddenInput.setAttribute('type', 'hidden');
+                    hiddenInput.setAttribute('name', 'stripeToken');
+                    hiddenInput.setAttribute('value', result.token.id);
+                    form.appendChild(hiddenInput);
+                    form.submit();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

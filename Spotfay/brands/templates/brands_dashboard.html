@@ -1,0 +1,52 @@
+{% extends 'brands_base.html' %}
+{% load static %}
+{% block title %}dashboard{% endblock %}
+{% block page_content %}
+
+  <!-- content -->
+  <div class="mx-auto mt-5 col-11 col-lg-9 col-xl-7 col-xxl-6">
+    <div class="row gap-0 d-flex">
+      <div class="col-6 col-md-3 py-2 px-2 px-sm-5 px-md-4 px-lg-4 m-auto">
+        <div class="bg-white rounded pb-3 pt-4 rounded-1 d-block shadow-sm">
+          <h6 class="text-center mt-1" style="font-size: 1rem;">Active campaigns</h6>
+          <h5 class="text-color text-center fw-semibold fs-2 mb-5 mt-4">{{active_orders|length|default_if_none:""}}</h5>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 py-2 px-2 px-sm-5 px-md-4 px-lg-4 m-auto">
+        <div class="bg-white rounded pb-3 pt-4 rounded-1 d-block shadow-sm">
+          <h5 class="text-center mt-1" style="font-size: 1rem;">Creators</h5>
+          <h5 class="text-color text-center fw-semibold fs-2 mb-5 mt-4"> {{applied_creators|length|default_if_none:""}} </h5>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 py-2 px-2 px-sm-5 px-md-4 px-lg-4 m-auto">
+        <div class="bg-white rounded pb-3 pt-4 rounded-1 d-block shadow-sm">
+          <h5 class="text-center mt-1" style="font-size: 1rem;">Approve content</h5>
+          <h5 class="text-color text-center fw-semibold fs-2 mb-5 mt-4"> {{approve_content_order|length|default_if_none:""}} </h5>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 py-2 px-2 px-sm-5 px-md-4 px-lg-4 m-auto">
+        <div class="bg-white rounded pb-3 pt-4 rounded-1 d-block shadow-sm">
+          <h5 class="text-center mt-1" style="font-size: 1rem;">Requiring delivery</h5>
+          <h5 class="text-color text-center fw-semibold fs-2 mb-5 mt-4"> {{requiring_delivery|length|default_if_none:""}} </h5>
+        </div>
+      </div>
+    </div>
+    <div class="card mb-3 col-12 mt-5 overflow-hidden border-0 shadow-sm d-none d-md-block">
+      <div class="row g-0">
+        <div class="col-md-5">
+          <img src="{% static 'brands/imgs/images-5.jpg' %}" class="img-fluid rounded-end " alt="...">
+        </div>
+        <div class="col-md-7">
+          <div class="card-body d-flex justify-content-center align-items-center" style="height: 100%;">
+            <div>
+              <h4 class="text-center">Get ads video</h4>
+              <a href="{% url 'brands_ordervideo' %}" class="btn btn-primary rounded-pill ms-1 mt-3" style="background-color: rgb(59	5	251);">Create campain</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+{% endblock %}

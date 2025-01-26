@@ -1,0 +1,171 @@
+{% extends 'brands_base.html' %}
+{% load static %}
+{% block title %}content{% endblock %}
+{% block page_content %}
+
+<div class="container p-0" style="height: 100vh;">
+    <div class="title border-bottom col-10 col-sm-11 col-lg-12 mx-auto mb-4 mt-5">
+        <h3>All Content</h3>
+    </div>
+    <div class="row row-cols-12 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5 g-3 mb-5 pb-5 mx-auto" id="video-container">
+        {% for video in all_videos|slice:"::-1" %}
+            <!-- Initial videos loaded by the server -->
+            <div class="col d-sm-block d-flex align-items-center justify-content-center applicants" style="height: 414px;">
+                <div class="card border-0 px-1 mx-auto" style="max-width: 250px;box-shadow: 0px 1px 5px #0000002d;min-width:250px;">
+                    <div class="overflow-hidden d-flex mt-3 align-items-center rounded rounded-1 mb-2 shadow-sm" style="height: 20rem;">
+                        <button class="btn p-0 bg-transparent position-relative z-0 w-100 h-100 border-0" id="fly" data-bs-toggle="modal" data-bs-target="#content{{video.id}}">
+                            <video width="100%" height="100%" class="rounded" height="auto" style="object-fit: cover;">
+                                <source src="{{ video.video_file.url }}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            <span class="material-symbols-outlined position-absolute top-50 start-50 translate-middle text-white" style="font-variation-settings: 'FILL'1,'wght'700,'GRAD'200,'opsz'24;font-size: 45px;">
+                                play_circle
+                            </span>
+                        </button>
+                    </div>
+                    <div class="card-body row g-1 row-cols-2 px-0">
+                        <a href="{{ video.video_file.url }}" download="{{ video.video_file.name }}" class="btn text-white rounded rounded-pill text-center w-75 mx-auto d-flex align-items-center justify-content-center" style="background-color: #4A0EFB;">
+                            Download <span class="material-symbols-outlined">download</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="modal video-modal fade" id="content{{ video.id }}" tabindex="-1" aria-labelledby="contentLabel{{ video.id }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content rounded rounded-4 overflow-hidden bg-transparent video-modal-content">
+                        <div class="modal-body bg-dark p-0 video-modal-body">
+                            <video controls id="contentPlayer{{ video.id }}" class="w-100 bg-dark overflow-hidden video-element" controlslist="nodownload">
+                                <source src="{{ video.video_file.url }}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Infinite Scroll and Video Modal Script -->
+<script>
+    // Reusable function to attach observer to video modals
+    function attachVideoModalObserver(modalId, videoElementId) {
+        let modal = document.getElementById(modalId);
+        let videoElement = document.getElementById(videoElementId);
+
+        function stopVideo() {
+            if (videoElement) {
+                videoElement.pause();
+                videoElement.currentTime = 0;
+            }
+        }
+
+        let observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.attributeName === "style") {
+                    let displayStyle = window.getComputedStyle(modal).display;
+                    if (displayStyle === 'none') {
+                        stopVideo();
+                    }
+                }
+            });
+        });
+
+        observer.observe(modal, { attributes: true });
+    }
+
+    // Attach the observer to initial videos
+    document.querySelectorAll('.video-modal').forEach(modal => {
+        const modalId = modal.id;
+        const videoElementId = modalId.replace('content', 'contentPlayer');
+        attachVideoModalObserver(modalId, videoElementId);
+    });
+
+    let page = 1;
+    let loading = false;
+
+    // Function to load more videos
+    function loadMoreVideos() {
+        if (!loading) {
+            loading = true;
+            page++;
+            fetch(`?page=${page}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',  // Indicate this is an AJAX request
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.videos.length > 0) {
+                        const videoContainer = document.getElementById('video-container');
+                        data.videos.forEach(video => {
+                            const videoCard = `
+                                <div class="col d-sm-block d-flex align-items-center justify-content-center applicants">
+                                    <div class="card border-0 px-1 mx-auto" style="max-width: 250px;box-shadow: 0px 1px 5px #0000002d;min-width:250px;">
+                                        <div class="overflow-hidden d-flex mt-3 align-items-center rounded rounded-1 mb-2 shadow-sm" style="height: 20rem;">
+                                            <button class="btn p-0 bg-transparent position-relative z-0 w-100 h-100 border-0" id="fly" data-bs-toggle="modal" data-bs-target="#content${video.id}">
+                                                <video width="100%" height="100%" class="rounded" height="auto" style="object-fit: cover;">
+                                                    <source src="${video.video_url}" type="video/mp4">
+                                                    Your browser does not support the video tag.
+                                                </video>
+                                                <span class="material-symbols-outlined position-absolute top-50 start-50 translate-middle text-white" style="font-variation-settings: 'FILL'1,'wght'700,'GRAD'200,'opsz'24;font-size: 45px;">
+                                                    play_circle
+                                                </span>
+                                            </button>
+                                        </div>
+                                        <div class="card-body row g-1 row-cols-2 px-0">
+                                            <a href="${video.download_url}" download="${video.download_name}" class="btn text-white rounded rounded-pill text-center w-75 mx-auto d-flex align-items-center justify-content-center" style="background-color: #4A0EFB;">
+                                                Download <span class="material-symbols-outlined">download</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal video-modal fade" id="content${video.id}" tabindex="-1" aria-labelledby="contentLabel${video.id}" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content rounded rounded-4 overflow-hidden bg-transparent video-modal-content">
+                                            <div class="modal-body bg-dark p-0 video-modal-body">
+                                                <video controls id="contentPlayer${video.id}" class="w-100 bg-dark overflow-hidden video-element" controlslist="nodownload">
+                                                    <source src="${video.video_url}" type="video/mp4">
+                                                    Your browser does not support the video tag.
+                                                </video>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                            videoContainer.insertAdjacentHTML('beforeend', videoCard);
+
+                            // Attach the observer to the new modal
+                            attachVideoModalObserver(`content${video.id}`, `contentPlayer${video.id}`);
+                        });
+                    }
+
+                    // Stop loading if there are no more videos
+                    if (!data.has_next) {
+                        window.removeEventListener('scroll', handleScroll); // Remove the scroll listener
+                    }
+
+                    loading = false;
+                })
+                .catch(error => {
+                    console.error('Error loading more videos:', error);
+                    loading = false;
+                });
+        }
+    }
+
+    // Function to handle scroll events
+    function handleScroll() {
+        const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+
+        // Load more videos if the user is near the bottom of the page
+        if (scrollTop + clientHeight >= scrollHeight - 100) { // 100px buffer
+            loadMoreVideos();
+        }
+    }
+
+    // Attach the scroll event listener
+    window.addEventListener('scroll', handleScroll);
+</script>
+
+{% endblock %}

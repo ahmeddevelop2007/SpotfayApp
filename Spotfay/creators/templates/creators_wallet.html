@@ -1,0 +1,199 @@
+{% extends 'creators_base.html' %}
+{% load static %}
+{% block page_title %}wallet{% endblock %}
+{% block page_content %}
+
+  <!-- content -->
+  <div class="content mt-5">
+    <div class="container mt-2 px-0">
+      {% if messages %}
+        {% for message in messages %}
+          {% if 'withdrawal_success' in message.tags %}
+            <div class="alert alert-success mx-sm-3 d-flex align-items-center justify-content-between" role="alert">
+              {{message}}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+      
+      <div class="row gap-3 justify-content-center mx-1" style="margin-bottom:5rem;">
+          <h3 class="d-block d-md-none">Wallet</h3>
+          <div class="container-fluid px-4 available-earnings py-4 bg-white col-sm-12 rounded shadow-sm">
+              <h5 class="text-secondary">Available earnings</h5>
+              <h4>${{available_earnings}}</h4>
+              <button class="btn text-white border-none px-4 mt-4" style="background-color: #3800fa;" data-bs-toggle="modal" data-bs-target="#withdraw_modal">
+                  Whithdraw
+              </button>
+              <!-- Modal -->
+              <div class="modal fade" id="withdraw_modal" tabindex="-1" aria-labelledby="#withdraw_modal_Label" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content rounded-2 border-0 pt-4 pb-0 pb-md-4 p-sm-4">
+                    <div class="modal-header border-2 pt-0 px-0">
+                      <h1 class="modal-title ms-2 ms-sm-0" style="font-size: 19px;" id="#withdraw_modal_Label">Withdraw money</h1>
+                    </div>
+                    <form method="POST">
+                      {% csrf_token %}
+                      <div class="modal-body px-2">
+                        <a href="{% url 'payment_method' %}" class="d-flex align-items-center shadow-sm rounded text-dark rounded-2 border text-decoration-none border-1 border-muted gap-2 gap-sm-3 px-3">
+                          <img width="60px" src="{% static 'creators/imgs/paypal.png' %}" alt="">
+                          {% if paypal_account.paypal_email == None %}
+                            <h6 class="m-0 text-warning ms-2" style="font-size: small;"><span class="d-flex align-items-center gap-1" style="font-size: inherit;">No Paypal account found <span class="material-symbols-outlined" style="font-size: inherit;">warning</span> </span> <div class="d-flex align-items-center" style="font-size: x-small;">Click here to add yours <span class="material-symbols-outlined" style="font-size: inherit;">arrow_forward</span></div> </h6>
+                          {% else %}
+                            <h6 class="m-0" style="font-size: small;">({{paypal_account.paypal_email}})</h6>
+                          {% endif %}
+                        </a>
+                        <h6 class="mt-4">Amount</h6>
+                        <div class="input-group mb-1">
+                          <span class="input-group-text" style="background-color: #e2e4e9;">$</span>
+                          <input type="text" required name="withdrawal_amount" oninput="checking_balance()" id="withdrawal_amount" class="form-control" aria-label="Dollar amount (with dot and two decimal places)" style="background-color: #eef0f4;">
+                        </div>
+                        <small class="text-danger" style="font-size: 13px;" id="withdrawal_amount_error"></small>                    
+                      </div>
+                      <div class="row row-cols-1 row-cols-md-2 g-3 px-0 g-md-3 mb-3 px-3 d-flex mt-1 flex-md-row flex-column-reverse">
+                        <div class="col ps-md-0">
+                            <button type="button" class="btn border border-muted border-2 col-12 fw-light rounded rounded-2 p-2" style="font-size:14px;" data-bs-dismiss="modal">Cancel</button>
+                        </div>
+                        <div class="col pe-md-0">
+                          {% if paypal_account == None %}
+                            <button type="submit" disabled class="btn btn-success col-12 fw-light rounded rounded-2 p-2" style="background-color: #4A0EFB;font-size:14px;">Withdraw money</button>
+                          {% else %}
+                            <button type="submit" id="submit_btn" class="btn btn-success col-12 fw-light rounded rounded-2 p-2" style="background-color: #4A0EFB;font-size:14px;">Withdraw money</button>
+                          {% endif %}
+                        </div>
+                        <!-- balance validation script -->
+                        <script>
+                          function checking_balance() {
+                            var withdrawal_amount = document.getElementById("withdrawal_amount").value;
+                            var available_earnings = Number("{{available_earnings}}");
+                            console.log(available_earnings)
+                            if (withdrawal_amount > available_earnings) {
+                              document.getElementById("withdrawal_amount_error").innerText = "Insufficient balance !";  
+                              document.getElementById("submit_btn").disabled = true;
+                            }
+                            else {
+                              document.getElementById("withdrawal_amount_error").innerText = "";
+                              document.getElementById("submit_btn").disabled = false;
+                            }
+                          }
+                          document.getElementById("withdrawal_amount").addEventListener("keydown", function(event) {
+                            if (event.key.match(/[a-zA-Z]/) && event.key !== "Backspace" && event.key !== "Delete") {
+                              event.preventDefault();
+                            } else if (event.key.match(/[^0-9\.]/) && event.key !== "Backspace" && event.key !== "Delete") {
+                              event.preventDefault();
+                            }
+                          });
+                        </script>
+                    </form>
+  
+                  </div>
+                  </div>
+                </div>
+              </div>
+          </div>
+          <div class="container-fluid px-4 pending-earnings pt-4 pt-sm-4 pb-5 pb-sm-5 py-md-4 bg-white col-sm-12 rounded shadow-sm">
+              <h5 class="text-secondary">Pending earnings</h5>
+              <h4>${{pending_earnings}}</h4>
+          </div>
+      </div>
+      <div class="row mx-1 mx-md-2 my-5">
+        {% if completed_jobs %}
+          <h4 class="p-md-0 mb-3">Orders history</h4>
+          <div class="container w-100 bg-white shadow-sm rounded px-2 px-md-5 pb-0 pt-3">
+            {% for job in completed_jobs %}
+            <div class="m-0 d-flex align-items-center justify-content-between p-0 col-sm-12 col-md-9 col-lg-8 my-3">
+                <div class="m-0 p-0 container-fluid">
+                    <div class="d-flex justify-content-between">
+                        <h6 class="col-7 col-md-9 col-lg-7">Order #{{job.id}}</h6>
+                        <h6 class="col-4 col-md-9 col-lg-7 text-muted">{{job.created_at|date:"Y-m-d"}}</h6>
+                    </div>
+                    <h6 class="text-muted mt-3 mb-0">{{job.creators_price}}$</h6>
+                </div>
+                <button data-bs-toggle="modal" data-bs-target="#order{{job.id}}" class="bg-transparent d-none d-md-block d-lg-block border-0 text-color">Details</button>
+                <div class="btn-group d-md-none">
+                    <button class="btn border-0 m-0 p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="material-symbols-outlined">
+                            more_vert
+                            </span>
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li><a class="dropdown-item" href="{% url 'creators_orderdetails' job.id %}">See Details</a></li>
+                    </ul>
+                  </div>                      
+            </div>
+            <hr class="m-0">  
+            <!-- see datails modal -->
+            <div class="modal fade" id="order{{job.id}}" tabindex="-1" aria-labelledby="see-details-Label" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                  <div class="modal-header d-block d-md-none border-0" dir="rtl">
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>        
+                  <div class="modal-body px-0 px-md-4">
+                      <div class="card mb-0 border-0" style="max-width: 540px;">
+                          <div class="row g-0">
+                            <div class="col-md-6 col-12 d-flex justify-content-center align-items-center">
+                              <img src="{{job.product_img.url}}" class="img-fluid col-10 rounded" style="max-height: 135px;max-width:190px;object-fit:contain;" alt="...">
+                            </div>
+                            <div class="col-md-6">
+                              <div class="card-body px-0 px-md-2">
+                                  <!-- Brand -->
+                                  <div class="d-flex mx-4 mx-md-0 align-items-center mb-3 gap-2">
+                                      <div class="rounded-circle d-flex align-items-center justify-content-center profile-picture overflow-hidden" style="width:2.5rem;height:2.5rem;">
+                                      <img src="{{job.company.company_logo.url}}" style="object-fit:cover;" class="w-100 h-100" alt="...">
+                                      </div>
+                                      <div class="">
+                                      <h6 class="mb-1 text-secondary">Brand</h6>
+                                      <h5 class="mb-0">{{job.company.company_name}}</h5>
+                                      </div>
+                                  </div>
+                                  <hr class="text-secondary fw-bold bg-secondary mx-0 d-block d-md-none" size="4px">
+                                  <h5 class="mb-2 mx-4 mx-md-0">{{job.project_name}}</h5>
+                                  <div class="d-flex align-items-center mx-4 mx-md-0 justify-content-between">
+                                    <h6 class="text-secondary">Earnings</h6>
+                                    <h5 class="d-flex align-items-center">{{job.creators_price|floatformat:0}}<span class="material-symbols-outlined">attach_money</span></h5>
+                                  </div>
+                                  <div class="d-flex align-items-center mx-4 mx-md-0 justify-content-between">
+                                    <h6 class="text-secondary">Product value</h6>
+                                    <h6>{{job.product_description}}$</h6>  <!-- add_product_value -->
+                                  </div>
+                                  <a href="https://{{job.product_link}}" class="d-flex align-items-center mx-4 mx-md-0 gap-3 mt-2 text-decoration-none" style="color:rgb(17	102	253);">Product link <span class="material-symbols-outlined">arrow_outward</span></a>
+                              </div>
+                          </div>
+                      </div>
+                        </div>
+                      <hr class="text-secondary fw-bold bg-secondary mx-0 my-0" size="4px">
+                      <h5 class="mb-3 mt-3 mx-4 mx-md-0">Job details</h5>
+                      <div class="d-flex align-items-center mx-4 mx-md-0 col-8 justify-content-between">
+                          <h6 class="text-secondary">Video duration</h6>
+                          <h6>{{job.video_duration}} sec.</h6>
+                      </div>
+                      <div class="d-flex align-items-center mx-4 mx-md-0 col-8 justify-content-between">
+                          <h6 class="text-secondary">Content format</h6>
+                          <h6>{{job.video_size}}</h6>
+                      </div>
+                      <div class="d-flex align-items-center mx-4 mx-md-0 col-8 justify-content-between">
+                          <h6 class="text-secondary">Content type</h6>
+                          <h6>{{job.video_type}}</h6>
+                      </div>        
+                      {% if job.additional_notes != "" %}
+                        <hr class="text-secondary fw-bold bg-secondary mx-0 my-3" size="4px">
+                        <h5 class="mb-3 mx-4 mx-md-0">Job description</h5>
+                        <p class="text-secondary mx-4 mx-md-0 fs-6">
+                          {{job.additional_notes}}
+                        </p>        
+                      {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+  
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+     </div>
+  </div>
+
+
+{% endblock %}

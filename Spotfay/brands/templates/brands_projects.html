@@ -1,0 +1,106 @@
+{% extends 'brands_base.html' %}
+{% load static %}
+{% block title %}campaigns{% endblock %}
+{% block page_content %}
+
+    <!-- content -->
+    <div class="col-12 col-md-10 mx-auto mt-5">
+      <ul class="nav mx-2 mx-sm-4 mx-md-0 mx nav-underline mb-3 gap-2 gap-md-4 border-bottom border-3 p-0" id="underline-tab" role="tablist">
+          <li class="nav-item ms-sm-5 d-flex" role="presentation">
+            <button class="nav-link position-relative text-muted fs-6 active d-flex align-items-center fw-light" style="top:3px;" id="underline-home-tab" data-bs-toggle="pill" data-bs-target="#underline-home" type="button" role="tab" aria-controls="underline-home" aria-selected="true"><span class="material-symbols-outlined fs-4">checklist</span>All campaigns {% if all_campaigns|length != 0 %}({{all_campaigns|length}}){% endif %}</button>
+          </li>
+          <li class="nav-item d-flex" role="presentation">
+            <button class="nav-link text-muted position-relative fs-6 d-flex align-items-center ms-1 fw-light" style="top:3px;" id="underline-profile-tab" data-bs-toggle="pill" data-bs-target="#underline-profile" type="button" role="tab" aria-controls="underline-profile" aria-selected="false"><span class="material-symbols-outlined fs-4">sort</span>Pending approval {% if pending_approval_campaigns|length != 0 %}({{pending_approval_campaigns|length}}){% endif %}</button>
+          </li>      
+        </ul>
+        <div class="tab-content" id="underline-tabContent">
+          <!-- All campaigns -->
+          <div class="tab-pane fade show active" id="underline-home" role="tabpanel" aria-labelledby="underline-home-tab" tabindex="0">   
+              <table class="table">
+                  <thead>
+                      <tr>
+                        <th scope="col">campaign</th>
+                        <th scope="col">status</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                    {% for campaign in all_campaigns|slice:"::-1" %}
+                      <tr>
+                        <th scope="row">
+                          <div class="d-flex flex-column gap-2 gap-sm-1">
+                            <a href="{% url 'brands_orderdetails' campaign.order.id %}" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;color:rgb(40	0	249);font-size:14px" class="fw-light">{{campaign.order.project_name}}</a>
+                            <div class="d-flex align-items-center gap-3">
+                              <h6 class="d-flex align-items-center text-black-50" style="font-size: 13px;"><span class="material-symbols-outlined fs-6" style="font-variation-settings: 'FILL'1;">videocam</span> {{campaign.order.num_of_videos}} </h6>
+                              <h6 class="d-flex align-items-center text-black-50" style="font-size: 13px;"><span class="material-symbols-outlined fs-6" style="font-variation-settings: 'FILL'1;">local_shipping</span> {{campaign.num_of_shipments}} </h6>
+                              <h6 class="d-flex align-items-center text-black-50" style="font-size: 13px;"><span class="material-symbols-outlined fs-6" style="font-variation-settings: 'FILL'1;">person</span> {{campaign.order.selecting_creators.all|length}} </h6>
+                              <h6 class="d-flex align-items-center text-black-50 fw-light" style="font-size: 13px;"><span class="material-symbols-outlined fs-6">schedule</span>{{campaign.order.created_at|date:"Y-m-d"}}</h6>
+                            </div>
+                          </div>
+                        </th>
+                        {% if campaign.order.order_status == "completed" %}
+                          <td class="" style="vertical-align: middle;">
+                            <div class="alert alert-primary border p-1 my-auto d-flex justify-content-center" style="width: 70px;font-size:12px" role="alert">Completed</div>
+                          </td>
+                          {% elif campaign.order.order_status == "pending_creator_approval" or campaign.order.order_status == "pending_creator_selecting" %} <!--creator has just approved the job-->
+                             <td class="" style="vertical-align: middle;">
+                               <div class="alert alert-warning border text-danger p-1 my-auto d-flex justify-content-center" style="width: 70px;font-size:12px" role="alert">Processing</div>
+                             </td>
+                         {% elif campaign.order.order_status == "processing"%} <!--creator had got approved by the brand owner-->
+                            <td class="" style="vertical-align: middle;">
+                              <div class="alert alert-success border p-1 my-auto d-flex justify-content-center" style="width: 70px;font-size:12px" role="alert">Active</div>
+                            </td> 
+                        {% elif campaign.order.order_status == "pending_approval"%} <!-- pending to approve the creator's video -->
+                          <td class="" style="vertical-align: middle;">
+                            <div class="alert alert-info border p-1 my-auto d-flex justify-content-center" style="width: 110px;font-size:12px" role="alert">Pending approval</div>
+                          </td> 
+                        {% elif campaign.order.order_status == "cancelled"%} <!--order cancelled-->
+                          <td class="" style="vertical-align: middle;">
+                            <div class="alert alert-danger border p-1 my-auto d-flex justify-content-center" style="width: 70px;font-size:12px" role="alert">Cancelled</div>
+                          </td>
+                        {% endif %}
+            
+                        <!-- <td class="" style="vertical-align: middle;">
+                          <div class="alert alert-warning border-0 text-danger p-1 my-auto d-flex justify-content-center" style="width: 70px;font-size:12px" role="alert">Processing</div>
+                        </td> -->
+                      </tr>               
+                    {% endfor %}
+                  </tbody>
+              </table>
+          </div>
+          <!-- Pending approval -->
+          <div class="tab-pane fade" id="underline-profile" role="tabpanel" aria-labelledby="underline-profile-tab" tabindex="0">
+            <table class="table">
+              <thead>
+                  <tr>
+                    <th scope="col">campaign</th>
+                  </tr>
+              </thead>
+              <tbody>
+                {% for campaign in pending_approval_campaigns|slice:"::-1" %}
+                  <tr>
+                    <th scope="row">
+                      <div class="d-flex flex-column gap-2 gap-sm-1">
+                        <a href="{% url 'brands_orderdetails' campaign.order.id %}" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;color:#2800f9;font-size:14px" class="fw-light">{{campaign.order.project_name}}</a>
+                        <div class="d-flex align-items-center gap-3">
+                          <h6 class="d-flex align-items-center text-black-50" style="font-size: 13px;"><span class="material-symbols-outlined fs-6" style="font-variation-settings: 'FILL'1;">videocam</span> {{campaign.order.num_of_videos}} </h6>
+                          <!-- <h6 class="d-flex align-items-center text-black-50" style="font-size: 13px;"><span class="material-symbols-outlined fs-6" style="font-variation-settings: 'FILL'1;">local_shipping</span> {{campaign.num_of_shipments}} </h6> -->
+                          <h6 class="d-flex align-items-center text-black-50" style="font-size: 13px;"><span class="material-symbols-outlined fs-6" style="font-variation-settings: 'FILL'1;">person</span> {{campaign.order.selecting_creators.all|length}} </h6>
+                          <h6 class="d-flex align-items-center text-black-50 fw-light" style="font-size: 13px;"><span class="material-symbols-outlined fs-6">schedule</span>{{campaign.order.created_at|date:"Y-m-d"}}</h6>
+                        </div>
+                      </div>
+                    </th>
+        
+                    <!-- <td class="" style="vertical-align: middle;">
+                      <div class="alert alert-warning border-0 text-danger p-1 my-auto d-flex justify-content-center" style="width: 70px;font-size:12px" role="alert">Processing</div>
+                    </td> -->
+                  </tr>               
+
+                {% endfor %}
+              </tbody>
+          </table>
+          </div>
+        </div>
+    </div>
+  
+
+{% endblock %}

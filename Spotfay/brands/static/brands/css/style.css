@@ -1,0 +1,172 @@
+/* General Styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #F0F2F5;
+  }
+
+.offcanvas-backdrop{
+  margin-top: 0px;
+}
+
+.active-element{
+color: #4A0EFB;
+}
+.bg-color{
+    background-color: #3800fa;
+}
+.text-color{
+    color: rgb(69	0	250);
+}
+.nav-pills .active{
+    background-color: transparent !important;
+    color: #4A0EFB !important;
+}
+.nav-underline .active {
+    color: #4A0EFB !important;
+  }
+  .nav-underline .nav-link:hover {
+    color: #4A0EFB !important;
+  }
+.navbar-white.navbar{
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.play-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 50px;
+  color: white;
+  pointer-events:none;
+}
+
+#scroll-div {
+  transition: transform 0.5s ease-in-out;
+}
+#rejection_reason::placeholder{
+  color: gray;
+  font-size: 13px;
+  width: 85%;
+}
+#brand_data ::placeholder{
+  color: #585a5eb4;
+}
+
+#brand_data .modal-content{
+  max-width: 300px;
+}
+
+input[type="radio"]{
+  display: none;
+}
+input[type="radio"] + label{
+  cursor:pointer;
+  transition: 0.5s;
+  box-shadow: 0px 0px 6px #00000043;
+}
+input[type="radio"] + label:hover{
+  background-color: #e7e7f9;
+}
+
+input[type="radio"]:checked + label {
+  background-color: #e7e7f9;
+  border:  #4512fb 1px solid;
+  box-shadow: 0px 0px 0px ;
+}
+
+
+/* Responsive Media Queries */
+@media (min-width: 480px) {
+  /* Default styles for small screens */
+ 
+}
+
+@media (min-width: 568px) {
+  /* Override styles for larger screens if needed */
+}
+
+@media (min-width: 600px) {
+  /* Override styles for larger screens if needed */
+}
+
+@media (min-width: 640px) {
+  /* Override styles for larger screens if needed */
+}
+
+@media (min-width: 720px) {
+  /* Override styles for larger screens if needed */
+}
+
+@media (min-width: 768px) {
+  /* Override styles for larger screens if needed */
+  #brand_data .modal-content{
+    max-width: 500px;
+  }
+}
+
+@media (min-width: 800px) {
+  /* Override styles for larger screens if needed */
+}
+
+@media (min-width: 900px) {
+  /* Override styles for larger screens if needed */
+}
+
+@media (min-width: 960px) {
+  /* Override styles for larger screens if needed */
+}
+
+@media (min-width: 1024px) {
+  /* Override styles for larger screens if needed */
+}
+
+@media (min-width: 1200px) {
+  /* Override styles for larger screens if needed */
+}
+
+@media (min-width: 1280px) {
+  /* Override styles for larger screens if needed */
+}
+
+@media (min-width: 1366px) {
+  /* Override styles for larger screens if needed */
+}
+
+@media (min-width: 1440px) {
+  /* Override styles for larger screens if needed */
+}
+
+@media (min-width: 1560px) {
+  /* Override styles for larger screens if needed */
+}
+
+@media (min-width: 1680px) {
+  /* Override styles for larger screens if needed */
+}
+
+@media (min-width: 1800px) {
+  /* Override styles for larger screens if needed */
+}
+
+@media (min-width: 1920px) {
+  /* Override styles for larger screens if needed */
+}
+
+@media (min-width: 2080px) {
+  /* Override styles for larger screens if needed */
+}
+
+@media (min-width: 2240px) {
+  /* Override styles for larger screens if needed */
+}
+
+@media (min-width: 2400px) {
+  /* Override styles for larger screens if needed */
+}
+
+@media (min-width: 2560px) {
+  /* Override styles for larger screens if needed */
+}

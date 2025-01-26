@@ -1,0 +1,316 @@
+{% extends 'creators_base.html' %}
+{% load static %}
+{% block page_title %}Order details{% endblock %}
+{% block page_content %}
+
+
+<!-- content -->
+<div class="col-sm-10 mx-sm-auto mt-4 p-0 container">
+    <a href="{% url 'creators_jobs' %}" class="btn bg-transparent border-0 p-0 mb-3 mb-md-5 ms-3 mt-3 mt-md-0 ms-sm-0">
+        <span class="material-symbols-outlined text-color">
+            keyboard_backspace
+        </span>
+    </a>
+    <div class="bg-white mb-4 m-0 p-2 py-4 py-md-2 shadow-sm">
+        <div class="m-0 p-0 col-md-12 col-lg-10 justify-content-between d-md-flex align-items-center">
+            <div class="card mb-0 border-0" style="max-width: 540px;">
+                <div class="row g-0">
+                    <div class="col-md-6 col-9 d-flex justify-content-center align-items-center">
+                        <img src="{{job_data.product_img.url}}" class="img-fluid col-10 rounded rounded-1" alt="...">
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card-body px-0 px-md-2">
+                            <!-- Brand -->
+                            <div class="d-flex ms-4 mx-md-0 align-items-center mb-3 gap-2">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center overflow-hidden"
+                                    style="width:45px;height:45px;min-width:45px;">
+                                    <img src="{{job_data.company.company_logo.url}}"
+                                        style="object-fit:cover;height:100%;width:100%;" alt="...">
+                                </div>
+                                <div class="">
+                                    <h6 class="mb-1 text-secondary">Brand</h6>
+                                    <h5 class="mb-0"
+                                        style="max-width:205px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                        {{job_data.company.company_name}}</h5>
+                                </div>
+                            </div>
+                            <h5 class="mb-2 mx-4 mx-md-0">{{job_data.product_name}}</h5>
+                            <div class="d-flex align-items-center mx-4 mx-md-0 justify-content-between">
+                                <h6 class="text-secondary">Earnings</h6>
+                                <h5 class="d-flex align-items-center"> {{job_data.creators_price|floatformat:0}} <span
+                                        class="material-symbols-outlined">attach_money</span></h5>
+                            </div>
+                            <div class="d-flex align-items-center mx-4 mx-md-0 justify-content-between">
+                                <h6 class="text-secondary">Product value</h6>
+                                <h6>{{job_data.product_description}}$</h6>
+                            </div>
+                            <a href="https://{{job_data.product_link}}"
+                                class="d-flex align-items-center mx-4 mx-md-0 gap-3 mt-2 text-decoration-none"
+                                style="color:rgb(17	102	253);">Product link <span
+                                    class="material-symbols-outlined">arrow_outward</span></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% if job_data.order_status == "completed" %}
+            <h6 class="d-flex align-items-center pe-3"><span class="material-symbols-outlined text-success fs-5"
+                    style="font-variation-settings: 'FILL'1;">fiber_manual_record</span>Completed</h6>
+            {% elif job_data.order_status == "pending_creator_approval"%} <!--creator has just approved the job-->
+            <h6 class="d-flex align-items-center pe-3"><span
+                    class="material-symbols-outlined text-warning-emphasis fs-5"
+                    style="font-variation-settings: 'FILL'1;">fiber_manual_record</span>Under Review</h6>
+            {% elif job_data.order_status == "processing"%} <!--creator had got approved by the brand owner-->
+            <h6 class="d-flex align-items-center pe-3"><span class="material-symbols-outlined text-primary fs-5"
+                    style="font-variation-settings: 'FILL'1;">fiber_manual_record</span>Active</h6>
+            {% elif job_data.order_status == "pending_approval"%} <!-- pending to approve the creator's video -->
+            <h6 class="d-flex align-items-center pe-3"><span class="material-symbols-outlined text-warning fs-5"
+                    style="font-variation-settings: 'FILL'1;">fiber_manual_record</span>Under Review</h6>
+            {% elif job_data.order_status == "cancelled"%} <!--order cancelled-->
+            <h6 class="d-flex align-items-center pe-3"><span class="material-symbols-outlined text-success fs-5"
+                    style="font-variation-settings: 'FILL'1;">fiber_manual_record</span>Completed</h6>
+            {% endif %}
+
+        </div>
+    </div>
+    <ul class="nav nav-underline gap-0 mb-3 border-bottom border-3" id="underline-tab" role="tablist">
+        <li class="nav-item  ms-sm-3 ms-md-5" role="presentation">
+            <button class="nav-link text-muted active d-flex align-items-center gap-1 fs-5 fw-light px-2 px-md-5"
+                id="upload-content-tab" data-bs-toggle="pill" data-bs-target="#details" type="button" role="tab"
+                aria-controls="underline-upload-content" aria-selected="true"><span class="material-symbols-outlined"
+                    style="font-variation-settings: 'FILL'1;">info</span><span
+                    class="d-none d-md-block">Order</span>Details</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link text-muted d-flex align-items-center gap-1 fs-5 fw-light ps-2 px-sm-2 px-md-5"
+                id="details-tab" data-bs-toggle="pill" data-bs-target="#upload-content" type="button" role="tab"
+                aria-controls="underline-details" aria-selected="false"><span
+                    class="material-symbols-outlined">upload</span>Upload Content</button>
+        </li>
+    </ul>
+    <div class="tab-content" id="underline-tabContent">
+        <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab" tabindex="0">
+            <!-- Order Details tab content -->
+            <div class="bg-white mb-4 shadow-sm rounded rounded-1 py-3 p-0 px-md-5">
+                <div class="m-0 px-2 px-0">
+                    <h5 class="mb-3 mx-4 my-4 mx-md-0">Job details</h5>
+                    <div
+                        class="d-flex align-items-center my-2 mx-4 mx-md-0 col-8 col-sm-6 col-md-5 col-lg-4 col-xl-3 justify-content-between">
+                        <h6 class="text-secondary">Video duration</h6>
+                        <h6>{{job_data.video_duration}} sec.</h6>
+                    </div>
+                    <div
+                        class="d-flex align-items-center mx-4 my-2 mx-md-0 col-8 col-sm-6 col-md-5 col-lg-4 col-xl-3 justify-content-between">
+                        <h6 class="text-secondary">Content format</h6>
+                        <h6>{{job_data.video_size}}</h6>
+                    </div>
+                    <div
+                        class="d-flex align-items-center mx-4 my-2 mx-md-0 col-8 col-sm-6 col-md-5 col-lg-4 col-xl-3 justify-content-between">
+                        <h6 class="text-secondary">Content type</h6>
+                        <h6>{{job_data.video_type}}</h6>
+                    </div>
+                </div>
+                {% if job_data.additional_notes %}
+                <hr class="text-secondary fw-bold bg-secondary mx-0 my-3" size="4px">
+                <div class="m-0 px-2">
+                    <h5 class="mb-3 mx-4 mx-md-0">Job description</h5>
+                    <p class="text-secondary mx-4 mx-md-0 fs-6 col-lg-6">
+                        {{job_data.additional_notes}}
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="tab-pane fade" id="upload-content" role="tabpanel" aria-labelledby="upload-content-tab"
+            tabindex="0">
+            <!-- (Upload Content) tab content -->
+            <div class="bg-white mb-4 shadow-sm rounded rounded-1 py-3 p-0 px-md-5">
+                <div class="d-flex flex-wrap">
+                    {% for video in job_data.videos.all %}
+                    <!-- video -->
+                    <div class="p-2 m-0 col-6 col-md-6 col-lg-4 col-xl-3 col-xxl-2 overflow-hidden"
+                        style="height: 12rem;">
+                        <div class="position-relative w-100 h-100 p-0 m-0">
+                            <button class="btn p-0 bg-transparent z-0 w-100 h-100 border-0" data-bs-toggle="modal" data-bs-target="#content{{video.id}}" id="fly"
+                                data-bs-toggle="modal" data-bs-target="#videoModal">
+                                <video width="100%" height="100%" class="rounded" height="auto"
+                                    style="object-fit: cover;">
+                                    <source src="{{video.video_file.url}}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                                <span
+                                    class="material-symbols-outlined position-absolute top-50 fs-1 start-50 translate-middle text-white"
+                                    style="font-variation-settings: 'FILL'1,'wght'700,'GRAD'200,'opsz'24;">
+                                    play_circle
+                                </span>
+                            </button>
+                            {% if video.video_status != 'approved' %}
+                            <a href="{% url 'delete_video' job_data.id video.id %}"
+                                class="btn position-absolute p-1 m-1 rounded-circle d-flex text-decoration-none align-items-center bg-white top-0 end-0"><span
+                                    class="material-symbols-outlined m-0 fs-3 p-0 text-muted"
+                                    style="font-variation-settings: 'FILL'1;">delete</span></a>
+                            {% endif %}
+                        </div>
+                    </div>         
+                    <!-- Video Modal -->
+                    <div class="modal video-modal fade" id="content{{ video.id }}" tabindex="-1" aria-labelledby="contentLabel{{ video.id }}" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content rounded rounded-4 overflow-hidden bg-transparent video-modal-content">
+                                <div class="modal-body p-0 video-modal-body">
+                                    <video controls id="contentPlayer{{ video.id }}" class="w-100 overflow-hidden video-element" controlslist="nodownload">
+                                        <source src="{{ video.video_file.url }}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- video player script -->
+                    <script>
+                        // Function to pause and reset video
+                        function stopVideo(videoElement) {
+                            if (videoElement) {
+                                videoElement.pause();
+                                videoElement.currentTime = 0;
+                            }
+                        }
+
+                            (function() {
+                                // Select the modal
+                                let modal = document.getElementById('content{{ video.id }}');
+                                let videoElement = document.getElementById('contentPlayer{{ video.id }}');
+
+                                // Create an observer to watch for changes in the modal's style attribute
+                                let observer = new MutationObserver(function(mutations) {
+                                    mutations.forEach(function(mutation) {
+                                        if (mutation.attributeName === "style") {
+                                            let displayStyle = window.getComputedStyle(modal).display;
+                                            if (displayStyle === 'none') {
+                                                stopVideo(videoElement);
+                                            }
+                                        }
+                                    });
+                                });
+
+                                // Start observing the modal for attribute changes
+                                observer.observe(modal, { attributes: true });
+                            })();
+                    </script>
+                                                             
+                    {% endfor %}
+                </div>
+
+                {% if job_data.num_of_videos != job_data.videos.all|length %}
+                    {% if job_data.order_status == 'processing' or job_data.order_status == 'pending_approval' %}               
+                        <form method="POST" class="form mx-2 mx-md-0 form mt-4" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="mb-5">
+                                <input type="hidden" name="job_data_id" value="{{job_data.id}}">
+                                <input type="file" class="d-none" id="video-input" name="video_files"
+                                    accept="video/*" multiple required>
+                                <label for="video-input" class="justify-content-center d-flex btn py-3"
+                                    style="width: 100%;background-color:#f1f2f6;border:0.2rem dotted #b7b9bd;" dir="ltr">
+                                    <div>
+                                        <h6 class="justify-content-center d-flex align-items-center" style="color:#57595d"><span
+                                                class="material-symbols-outlined text-center mx-1" style="font-variation-settings: 'FILL'1;">videocam</span>click to
+                                            upload video here</h6>
+                                        <small class="text-black-50 text-center m-auto d-block">Asect ratio {{job_data.video_size}}</small>
+                                        <small class="text-black-50 text-center m-auto d-block">Up to 500 MB</small>
+                                        <small class="text-black-50 text-center m-auto d-block">Maximum resolution</small>
+                                        <small class="text-black-50 text-center m-auto d-block">1280x720</small>
+                                        <small class="text-black-50 text-center m-auto d-block">Maximum <span
+                                                id="max_files"></span> files</small>
+                                        <small class="text-black-50 text-center m-auto d-block">Duration 10 - 60 seconds</small>
+                                        <small class="text-danger w-100 text-break text-wrap text-center m-auto d-block"
+                                            id="error_handler" style="font-size:small;"></small>
+                                        <small class="text-success text-center m-auto d-block"
+                                            id="selected_vids" style="font-size:small;"></small>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-end">
+                                <button class="btn btn-primary bg-color text-white text-end px-5" id="submitbtn">Submit content</button>
+                            </div>
+                        </form>                    
+                    {% endif %}
+                {% endif %}
+
+            </div>
+            <script>
+                const submitBtn = document.getElementById('submitbtn');
+                const videoInput = document.getElementById('video-input');
+                const error_handler = document.getElementById('error_handler');
+                const selected_vids = document.getElementById('selected_vids');
+                let uploaded_videos = Number('{{job_data.videos.all|length}}');
+                let req_videos_num = Number('{{job_data.num_of_videos}}');
+                let max_files = document.getElementById('max_files');
+                let left_videos = req_videos_num - uploaded_videos;
+            
+                if (max_files) {
+                    max_files.innerText = left_videos;
+                }
+            
+                if (videoInput && submitBtn && error_handler && selected_vids) {
+                    videoInput.addEventListener('change', (e) => {
+                        const files = videoInput.files;
+                        const validFiles = [];
+                        let errorMessages = [];
+            
+                        // Reset error and selected videos display
+                        error_handler.innerText = "";
+                        selected_vids.innerText = `Selected ${files.length} video${files.length === 1 ? '' : 's'}`;
+            
+                        if (files.length > left_videos) {
+                            selected_vids.innerText = "";
+                            error_handler.innerText = `You can only upload ${left_videos} video${left_videos === 1 ? '' : 's'}`;
+                            submitBtn.disabled = true;
+                            return;
+                        }
+            
+                        for (let i = 0; i < files.length; i++) {
+                            const file = files[i];
+            
+                            // Check if the file is a video
+                            if (!file.type.startsWith('video/')) {
+                                errorMessages.push(`Invalid file type for ${file.name}`);
+                                continue;
+                            }
+            
+                            const video = document.createElement('video');
+                            video.src = URL.createObjectURL(file);
+            
+                            video.addEventListener('loadedmetadata', () => {
+                                const videoDuration = video.duration;
+                                const fileSize = file.size;
+            
+                                if (fileSize <= 500 * 1024 * 1024 && videoDuration <= 120) {
+                                    validFiles.push(file);
+                                } else {
+                                    errorMessages.push(`Invalid file ${file.name}: Size or duration exceeded limits.`);
+                                }
+            
+                                // Clean up the object URL
+                                URL.revokeObjectURL(video.src);
+            
+                                // Update error handler and submit button state
+                                if (errorMessages.length > 0) {
+                                    selected_vids.innerText = "";
+                                    error_handler.innerText = errorMessages.join('\n');
+                                    submitBtn.disabled = true;
+                                } else {
+                                    error_handler.innerText = "";
+                                    submitBtn.disabled = false;
+                                }
+                            });
+                        }
+                    });
+                }
+            </script>
+        </div>
+    </div>
+
+
+
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,266 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="title">{% block title %}{% endblock %}</title>
+  <script src="https://js.stripe.com/v3/"></script>
+  <link rel="icon" href="{% static 'brands/imgs/spotfay_mobi.png' %}" type="image/png">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  {% load django_bootstrap5 %}    
+  {% bootstrap_css %}
+  {% bootstrap_javascript %}
+  <link rel="stylesheet" href="{% static 'brands/css/style.css' %}">
+  <!-- <style>
+    .video-container {
+      position: relative;
+      cursor: pointer;
+      display: inline-block;
+      margin: 10px;
+
+  }
+
+  .play-button {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 50px;
+      color: white;
+      pointer-events: none;
+  }
+
+  .video-modal-content {
+      background-color: transparent;
+      border: none;
+  }
+  
+  .video-element{
+    border-radius: 10px;
+  }
+
+  .video-modal-body {
+      padding: 0;
+  }
+
+  .modal-dialog-centered {
+      max-width: 700px;
+  }
+    /* Card Number */
+    #card-element {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 100%;
+      font-size: 20rem;
+      font-family: Arial, sans-serif;
+    }
+    .hover-radio:hover{
+      background: #490efb27;
+    }
+    .hover-span:hover{
+      background-color: #8080803d;
+      transition: 0.5s;
+      cursor: pointer;
+    }
+    .card-on-other{
+      transform: translateY(20rem);
+    }
+    .ver-nav-font{
+      font-size: 2rem;
+    }
+    .material-symbols-outlined {
+      font-variation-settings:
+      'FILL' 1,
+      'wght' 700,
+      'GRAD' 200,
+      'opsz' 48
+    }
+    .hovering:hover{
+      background-color: #8080803d;
+    }
+    .menu-hover{
+      width: 3.5rem;
+      transition: 0.5s;
+      overflow: hidden;
+      flex-wrap: nowrap;
+      flex-shrink: 0;
+    }
+    .menu-hover:hover{
+      width: 13rem;
+    }
+    .link-inuse{
+        color: white;
+    }
+    /* .link_notusing{
+        color: #6c757d;
+    } */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #F0F2F5;
+    }
+  </style> -->
+</head>
+<body>
+  <div>
+      <!-- Navbar -->
+  <nav class="navbar shadow-sm navbar-expand-lg navbar-white bg-white">
+    <div class="container-fluid">
+    <a class="navbar-brand d-none d-md-block" href="{% url 'brands_dash' %}"><img src="{% static 'brands/imgs/spotfay.png' %}" alt="Spotfay Logo" style="width: 120px;"></a>
+    <a class="navbar-brand d-block d-md-none py-0" href="{% url 'brands_dash' %}"><img src="{% static 'brands/imgs/spotfay_mobi.png' %}" alt="Spotfay Logo" style="width: 60px;"></a>
+        <button class="navbar-toggler border border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar" aria-expanded="false" aria-label="offcanvasright">
+        <span class="material-symbols-outlined fs-1 fw-bold">menu</span>
+    </button>
+    <div class="offcanvas offcanvas-end w-75" tabindex="-1" id="sidebar" aria-labelledby="offcanvasright">
+        <div class="offcanvas-header d-sm-block d-md-block d-lg-none mt-5">
+            <div class="d-block">
+            <div class="rounded-circle profile-picture" style="width: 50px; height: 50px; background-color: #cdcdff; display: flex; justify-content: center; align-items: center; color: #7148fc; font-size: 20px; font-weight: light;"></div>
+            <h5 class="offcanvas-title my-1" id="offcanvasLabel">{{username}}</h5>
+            <h6 class="offcanvas-title text-dark text-opacity-75 fw-light" id="offcanvasLabel">{{user.email}}</h6>
+        </div>
+        </div>
+        <hr class="m-0 text-secondary d-sm-block d-md-block d-lg-none fw-bold bg-secondary" size="4px">
+        <div class="offcanvas-body d-lg-flex justify-content-center px-0">
+        <ul class="navbar-nav mb-2 mb-lg-0 gap-2 px-3 px-lg-0">
+            <li class="nav-item"><a class="nav-link fs-6" id="dashboard" href="{% url 'brands_dash' %}">Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link fs-6" id="campaigns" href="{% url 'brands_projectmanagment' %}">Campaigns</a></li>
+            <li class="nav-item"><a class="nav-link fs-6" id="shipments" href="{% url 'brands_shipping' %}">Shipments</a></li>
+            <li class="nav-item"><a class="nav-link fs-6" id="content" href="{% url "brands_myprojects" %}">Content</a></li>
+            <li class="nav-item"><a class="nav-link fs-6" id="brands" href="{% url 'brands_companydata' %}">My brands</a></li>
+        </ul>
+        <hr class="m-0 text-secondary fw-bold bg-secondary" size="4px">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 px-3 d-sm-block d-md-block d-lg-none">
+            <li class="nav-item"><a class="nav-link fs-5" id="account" href="{% url 'brands_account' %}">Account</a></li>
+            <li class="nav-item"><a class="nav-link fs-5" target="_blank" href="https://help.spotfay.com/brands/">Support</a></li>
+            <li class="nav-item"><a href="{% url 'creators_logout' %}" class="nav-link align-items-center d-flex text-danger fs-5">Log out<span class="material-symbols-outlined ms-1">logout</span></a></li>
+        </ul>
+        </div>
+    </div>
+    <ul class="navbar-nav d-flex align-items-center gap-4 justify-content-end d-none d-lg-flex">
+        <li class="nav-item"><a class="btn nav-link d-flex align-items-center btn-primary bg-color m-0 text-white gap-2 px-4" style="background-color: #3800fa;" href="{% url 'brands_ordervideo' %}">Create campaign<span class="material-symbols-outlined text-white" >add</span></a></li>
+        <li class="nav-item"><a class="nav-link p-0 m-0" target="_blank" href="https://help.spotfay.com/brands/"><span class="material-symbols-outlined fs-2" >contact_support</span></a></li>
+        <!-- <li class="nav-item"><a class="nav-link p-0 m-0" href="#"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">notifications</span></a></li> -->
+        <li class="nav-item dropdown">
+            <a class="nav-link" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <div class="rounded-circle profile-picture" style="width: 30px; height: 30px; background-color: #cdcdff; display: flex; justify-content: center; align-items: center; color: #7148fc; font-size: 12px; font-weight: light;"></div>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="profileDropdown">
+                <li><h6 class="dropdown-item py-0 my-0">{{username}}</h6></li>
+                <li><h6 class="text-secondary dropdown-item py-0 my-0">{{user.email}}</h6></li>
+                <hr class="mt-1 mb-2">
+                <li><a class="dropdown-item" href="{% url 'brands_account' %}">Account</a></li>
+                <li><a class="dropdown-item" target="_blank" href="https://help.spotfay.com/brands/">Support</a></li>
+                <li><a href="{% url 'brands_logout' %}" class="dropdown-item align-items-center d-flex text-danger">Log out<span class="material-symbols-outlined ms-1">logout</span></a></li>
+            </ul>
+        </li>
+    </ul>
+    </div>
+  </nav>
+{% if messages %}
+<!-- messages -->
+  <div class="mb-0 pb-0 justify-content-center" style="width:100%;">
+    {% if messages %}
+      <script>
+        document.body.style.overflow = 'hidden';
+      </script>
+      {% for message in messages %}
+      {% if message.message == "Add your brand first" %}
+        <div class="alert alert-danger alert-dismissible fade show justify-content-end mb-0" role="alert">
+          <div class="d-flex align-items-center justify-content-around" style="width: 70%">
+            <a href="{% url 'brands_companydata' %}" class="btn btn-danger" >My brands</a>
+            <div class="d-flex align-items-center">
+              <div class="fs-6">{{message}}</div>
+              <svg xmlns="http://www.w3.org/2000/svg" height="1rem" viewBox="0 -960 960 960" width="2rem" fill="#EA3323"><path d="M480-280q17 0 28.5-11.5T520-320q0-17-11.5-28.5T480-360q-17 0-28.5 11.5T440-320q0 17 11.5 28.5T480-280Zm-40-160h80v-240h-80v240Zm40 360q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Z"/></svg>
+            </div>
+          </div>
+        </div>
+        {% elif message.message == "Order Placed Successfully!" %}
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+          <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-body p-0">
+              <div class="alert alert-success m-0 d-flex align-items-center justify-content-between" role="alert">
+                {{message}}
+                <button type="button" class="btn-close text-end" data-bs-dismiss="toast" aria-label="Close"></button>
+              </div>            
+            </div>
+          </div>
+        </div>
+      {% endif %}
+      {% endfor %}
+    {% endif %}
+  </div>
+{% endif %}
+
+    {% block page_content %}{% endblock %}
+  </div>
+  
+    {% block video_player_script %}
+    <!-- video player script -->
+    <script>
+      // Function to pause and reset video
+      function stopVideo(videoElement) {
+          if (videoElement) {
+              videoElement.pause();
+              videoElement.currentTime = 0;
+          }
+      }
+  
+      {% for video in cretor.previous_works %}
+          (function() {
+              // Select the modal
+              let modal = document.getElementById('videoModal{{ video.id }}');
+              let videoElement = document.getElementById('videoPlayer{{ video.id }}');
+  
+              // Create an observer to watch for changes in the modal's style attribute
+              let observer = new MutationObserver(function(mutations) {
+                  mutations.forEach(function(mutation) {
+                      if (mutation.attributeName === "style") {
+                          let displayStyle = window.getComputedStyle(modal).display;
+                          if (displayStyle === 'none') {
+                              stopVideo(videoElement);
+                          }
+                      }
+                  });
+              });
+  
+              // Start observing the modal for attribute changes
+              observer.observe(modal, { attributes: true });
+          })();
+      {% endfor %}
+  </script>
+  {% endblock %}
+<!-- getting username first 2 letters -->
+<script>
+  let realusername = '{{username}}';
+  function firstLettersOfWords(realusername) {
+      return realusername.split(' ').map(word => word.charAt(0).toUpperCase()).join('');
+      }
+  document.querySelectorAll(".profile-picture").forEach(function(element) {
+  element.innerText = firstLettersOfWords(realusername);
+  });
+</script>
+  <!-- link detector -->
+  <script>
+    let page_title = document.getElementById('title').innerHTML;
+    const elements = {
+        dashboard: document.getElementById('dashboard'),
+        campaigns: document.getElementById('campaigns'),
+        shipments: document.getElementById('shipments'),
+        content: document.getElementById('content'),
+        brands: document.getElementById('brands'),
+        account: document.getElementById('account'),
+        help_center: document.getElementById('help_center'),
+    };
+ 
+    for(let id in elements){
+        if(elements[id].id == page_title){
+            elements[id].classList.add('active-element');
+        }else{
+            elements[id].classList.remove('active-element');   
+        }
+    }
+  </script>
+  <script src="{% static 'brands/js/script.js' %}"></script>
+</body>
+</html>

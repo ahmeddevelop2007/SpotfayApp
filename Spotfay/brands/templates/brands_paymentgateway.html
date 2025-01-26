@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment for {{ product_name }}</title>
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+/* Add some basic styling to our payment form */
+        #new-card-section{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Payment for {{ product_name }}</h1>
+    <form id="payment-form" action="{% url 'brands_paymentgateway' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="use_saved_method" id="use-saved-method" value="true">
+
+        <h2>Select a saved payment method</h2>
+        <ul>
+            {% for payment_method in payment_methods %}
+                <li>
+                    <input type="radio" name="payment_method_id" value="{{ payment_method.stripe_payment_method_id }}" checked>
+                    {{ payment_method.card_brand }} ending in {{ payment_method.last4 }}
+                </li>
+            {% endfor %}
+        </ul>
+
+        <h2>Or enter a new card</h2>
+        <div id="new-card-section">
+            <div id="card-element"></div>
+        </div>
+        <button type="button" id="new-card-button">Use New Card</button>
+
+        <button type="submit">Pay</button>
+    </form>
+
+<script>
+    var stripe = Stripe('{{ stripe_publishable_key }}');
+    var elements = stripe.elements();
+    var card = elements.create('card');
+    card.mount('#card-element');
+
+    document.getElementById('new-card-button').addEventListener('click', function() {
+        document.getElementById('use-saved-method').value = 'false';
+        document.getElementById('new-card-section').style.display = 'block';
+    });
+
+    var form = document.getElementById('payment-form');
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        if (document.getElementById('use-saved-method').value === 'false') {
+            stripe.createToken(card).then(function(result) {
+                if (result.error) {
+                    // Display error.message in your UI.
+                    console.log(result.error.message);
+                } else {
+                    // Add the token to the form.
+                    var hiddenInput = document.createElement('input');
+                    hiddenInput.setAttribute('type', 'hidden');
+                    hiddenInput.setAttribute('name', 'stripeToken');
+                    hiddenInput.setAttribute('value', result.token.id);
+                    form.appendChild(hiddenInput);
+
+                    // Submit the form.
+                    form.submit();
+                }
+            });
+        } else {
+            form.submit();
+        }
+    });
+</script>
+</body>
+</html>
